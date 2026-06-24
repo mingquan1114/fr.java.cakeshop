@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>结算支付 - 蛋糕系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/main.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/zui.min.css}">
+    <script type="text/javascript" th:src="@{/js/jquery-3.0.0.js}"></script>
+    <script type="text/javascript" th:src="@{/js/zui.min.js}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style type="text/css">
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+        .animated-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; overflow: hidden; z-index: 0;
+        }
+        .gradient-circle {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4;
+            animation: float 15s infinite ease-in-out;
+        }
+        .circle-pink {
+            width: 600px; height: 600px; background: radial-gradient(circle, #ff6b9d 0%, #c44569 100%);
+            top: -250px; left: -150px;
+        }
+        .circle-blue {
+            width: 500px; height: 500px; background: radial-gradient(circle, #4facfe 0%, #00f2fe 100%);
+            bottom: -200px; right: -100px; animation-delay: -5s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 30px) scale(1.1); }
+        }
+        nav {
+            position: relative; z-index: 100;
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar-brand {
+            font-size: 1.5em !important; font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe, #a8edea);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .navbar-nav > li > a {
+            color: rgba(255, 255, 255, 0.8) !important; transition: all 0.3s ease;
+        }
+        .navbar-nav > li > a:hover { color: #ff6b9d !important; }
+        .main-content {
+            position: relative; z-index: 10; padding: 60px 20px;
+            min-height: calc(100vh - 100px);
+        }
+        .page-header { text-align: center; margin-bottom: 40px; }
+        .page-title {
+            font-size: 36px; font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe, #a8edea);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .payment-container {
+            max-width: 800px; margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px;
+            overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .payment-section {
+            padding: 25px 30px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .section-title {
+            font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title i { color: #ff6b9d; }
+        .form-group { margin-bottom: 20px; }
+        .form-label {
+            display: block; font-size: 14px; color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%; padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px; color: #fff; font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none; border-color: #ff6b9d;
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.2);
+        }
+        .form-input::placeholder { color: rgba(255, 255, 255, 0.4); }
+        .pay-methods { display: flex; gap: 20px; }
+        .pay-method {
+            flex: 1; padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px; cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        .pay-method:hover { border-color: rgba(255, 107, 157, 0.5); }
+        .pay-method.selected {
+            border-color: #ff6b9d;
+            background: rgba(255, 107, 157, 0.15);
+        }
+        .pay-icon { width: 80px; height: auto; object-fit: contain; }
+        .pay-name {
+            font-size: 16px; font-weight: 600; color: #fff;
+        }
+        .order-summary {
+            padding: 20px; background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px; margin-bottom: 15px;
+        }
+        .summary-item {
+            display: flex; justify-content: space-between;
+            padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .summary-item:last-child { border-bottom: none; }
+        .summary-label { color: rgba(255, 255, 255, 0.6); font-size: 14px; }
+        .summary-value { color: #fff; font-size: 14px; }
+        .total-section {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 20px 0;
+        }
+        .total-label {
+            font-size: 18px; font-weight: 600; color: rgba(255, 255, 255, 0.8);
+        }
+        .total-amount {
+            font-size: 32px; font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .payment-footer {
+            padding: 25px 30px;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex; justify-content: flex-end; gap: 15px;
+        }
+        .btn {
+            padding: 14px 35px; border: none; border-radius: 30px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+            color: white; box-shadow: 0 10px 30px rgba(255, 107, 157, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.5);
+        }
+        .footer {
+            position: relative; z-index: 10; text-align: center;
+            padding: 30px; color: rgba(255, 255, 255, 0.4); font-size: 14px;
+            background: rgba(0, 0, 0, 0.2); margin-top: 60px;
+        }
+        .error-message {
+            color: #ff6b6b; font-size: 14px; margin-bottom: 15px;
+            padding: 12px; background: rgba(255, 107, 107, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="gradient-circle circle-pink"></div>
+        <div class="gradient-circle circle-blue"></div>
+    </div>
+
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid" style="font-size:1.2em; padding-top:10px; padding-left:50px; padding-right:50px;">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-example">
+                    <span class="sr-only">切换导航</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" th:href="@{/goods/goodsList}">🍰 蛋糕系统</a>
+            </div>
+            <div class="collapse navbar-collapse navbar-collapse-example">
+                <ul class="nav navbar-nav">
+                    <li><a th:href="@{/goods/goodsList}">首页</a></li>
+                    <li><a th:href="@{/cart/myCart}">购物车</a></li>
+                    <li><a th:href="@{/register}">注册</a></li>
+                    <li><a th:href="@{/user/loginout}">退出登录</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">💳 结算支付</h1>
+        </div>
+
+        <div class="payment-container">
+            <div class="payment-section">
+                <h2 class="section-title">
+                    <i class="fas fa-user"></i> 收货信息
+                </h2>
+                <form id="paymentForm" action="/payment/submit" method="post">
+                    <input type="hidden" name="cartIds" th:value="${cartIds}">
+                    
+                    <div class="form-group">
+                        <label class="form-label">收货人 *</label>
+                        <input type="text" name="receiverName" class="form-input" 
+                               th:value="${user.name}" placeholder="请输入收货人姓名" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">收货电话 *</label>
+                        <input type="tel" name="receiverPhone" class="form-input" 
+                               th:value="${user.phone}" placeholder="请输入收货电话" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">收货地址 *</label>
+                        <input type="text" name="receiverAddress" class="form-input" 
+                               th:value="${user.address}" placeholder="请输入收货地址" required>
+                    </div>
+            </div>
+
+            <div class="payment-section">
+                <h2 class="section-title">
+                    <i class="fas fa-credit-card"></i> 支付方式
+                </h2>
+                <div class="pay-methods">
+                    <div class="pay-method selected" onclick="selectPayMethod('wechat')">
+                        <img class="pay-icon" th:src="@{/images/wechat.jpg}" alt="微信支付">
+                        <div class="pay-name">微信支付</div>
+                        <input type="radio" name="payMethod" value="wechat" checked hidden>
+                    </div>
+                    <div class="pay-method" onclick="selectPayMethod('alipay')">
+                        <img class="pay-icon" th:src="@{/images/alipay.jpg}" alt="支付宝">
+                        <div class="pay-name">支付宝</div>
+                        <input type="radio" name="payMethod" value="alipay" hidden>
+                    </div>
+                </div>
+            </div>
+
+            <div class="payment-section">
+                <h2 class="section-title">
+                    <i class="fas fa-shopping-cart"></i> 订单信息
+                </h2>
+                <div th:each="cart : ${cartList}" class="order-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">商品</span>
+                        <span class="summary-value" th:text="${cart.name} != null ? ${cart.name} : ${cart.intro}"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">数量</span>
+                        <span class="summary-value">x[[${cart.amount}]]</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">单价</span>
+                        <span class="summary-value">¥[[${cart.price}]]</span>
+                    </div>
+                </div>
+                
+                <div class="total-section">
+                    <span class="total-label">订单总金额</span>
+                    <span class="total-amount">¥[[${totalAmount}]]</span>
+                </div>
+            </div>
+
+            <div class="payment-footer">
+                <button type="button" class="btn btn-secondary" onclick="location.href='/cart/myCart'">
+                    <i class="fas fa-arrow-left"></i> 返回购物车
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-credit-card"></i> 立即支付
+                </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2026 蛋糕系统 - 用心烘焙每一份甜蜜</p>
+    </div>
+
+    <script type="text/javascript">
+        function selectPayMethod(method) {
+            document.querySelectorAll('.pay-method').forEach(el => el.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            document.querySelector(`input[name="payMethod"][value="${method}"]`).checked = true;
+        }
+    </script>
+</body>
+</html>

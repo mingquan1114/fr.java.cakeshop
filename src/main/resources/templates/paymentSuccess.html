@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>支付成功 - 蛋糕系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/main.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/zui.min.css}">
+    <script type="text/javascript" th:src="@{/js/jquery-3.0.0.js}"></script>
+    <script type="text/javascript" th:src="@{/js/zui.min.js}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style type="text/css">
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+        .animated-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; overflow: hidden; z-index: 0;
+        }
+        .gradient-circle {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4;
+            animation: float 15s infinite ease-in-out;
+        }
+        .circle-pink {
+            width: 600px; height: 600px; background: radial-gradient(circle, #ff6b9d 0%, #c44569 100%);
+            top: -250px; left: -150px;
+        }
+        .circle-blue {
+            width: 500px; height: 500px; background: radial-gradient(circle, #4facfe 0%, #00f2fe 100%);
+            bottom: -200px; right: -100px; animation-delay: -5s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 30px) scale(1.1); }
+        }
+        .main-content {
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; min-height: 100vh; padding: 60px 20px;
+        }
+        .success-card {
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px;
+            padding: 60px 40px; text-align: center;
+            max-width: 500px; width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .success-icon {
+            width: 120px; height: 120px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b9d 0%, #4facfe 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.4);
+        }
+        .success-title {
+            font-size: 28px; font-weight: 700; color: #fff;
+            margin-bottom: 15px;
+        }
+        .success-message {
+            font-size: 16px; color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 30px;
+        }
+        .order-info {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px; padding: 25px;
+            margin-bottom: 30px; text-align: left;
+        }
+        .info-row {
+            display: flex; justify-content: space-between;
+            padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: rgba(255, 255, 255, 0.6); font-size: 14px; }
+        .info-value { color: #fff; font-size: 14px; font-weight: 500; }
+        .amount-value {
+            font-size: 24px; font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .btn {
+            padding: 14px 45px; border: none; border-radius: 30px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+            color: white; box-shadow: 0 10px 30px rgba(255, 107, 157, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.5);
+        }
+        .footer {
+            position: relative; z-index: 10; text-align: center;
+            padding: 30px; color: rgba(255, 255, 255, 0.4); font-size: 14px;
+            background: rgba(0, 0, 0, 0.2); margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="gradient-circle circle-pink"></div>
+        <div class="gradient-circle circle-blue"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="success-card">
+            <div class="success-icon">✓</div>
+            <h1 class="success-title">支付成功</h1>
+            <p class="success-message">感谢您的购买，您的订单已提交成功！</p>
+            
+            <div class="order-info">
+                <div class="info-row">
+                    <span class="info-label">订单编号</span>
+                    <span class="info-value" th:text="${orderNo}"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">支付金额</span>
+                    <span class="amount-value">¥[[${totalAmount}]]</span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="location.href='/goods/goodsList'">
+                <i class="fas fa-home"></i> 返回首页
+            </button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2026 蛋糕系统 - 用心烘焙每一份甜蜜</p>
+    </div>
+</body>
+</html>

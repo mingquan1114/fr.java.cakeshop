@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的订单</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <link type="text/css" rel="stylesheet" th:href="@{/css/main.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/zui.min.css}">
+    <script type="text/javascript" th:src="@{/js/jquery-3.0.0.js}"></script>
+    <script type="text/javascript" th:src="@{/js/zui.min.js}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .gradient-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .circle-pink {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #ff6b9d 0%, #c44569 100%);
+            top: -250px;
+            left: -150px;
+        }
+
+        .circle-blue {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #4facfe 0%, #00f2fe 100%);
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        .circle-purple {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #a8edea 0%, #fed6e3 100%);
+            top: 30%;
+            left: 60%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        nav {
+            position: relative;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.5em !important;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe, #a8edea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-nav > li > a {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav > li > a:hover {
+            color: #ff6b9d !important;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 30px !important;
+        }
+
+        .search-input {
+            background: transparent !important;
+            border: none !important;
+            color: #fff !important;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b9d 0%, #4facfe 100%) !important;
+            border: none !important;
+            border-radius: 30px !important;
+            padding: 8px 25px !important;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding: 60px 20px;
+            min-height: calc(100vh - 100px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe, #a8edea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+        }
+
+        .search-input-field {
+            width: 400px;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input-field:focus {
+            border-color: rgba(255, 107, 157, 0.5);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.2);
+        }
+
+        .search-input-field::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-search {
+            padding: 12px 35px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #4facfe 100%);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn-reset {
+            padding: 12px 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .order-table th {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px 15px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .order-table td {
+            padding: 18px 15px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 14px;
+        }
+
+        .order-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .order-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-paid {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            color: white;
+        }
+
+        .status-shipped {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .status-completed {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #1a1a2e;
+        }
+
+        .btn-cancel, .btn-receive, .btn-detail {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 8px;
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-receive {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            color: white;
+        }
+
+        .btn-receive:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-detail {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-detail:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+        }
+
+        .pagination-info {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        .pagination-link {
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-link:hover {
+            background: rgba(255, 107, 157, 0.3);
+            color: #ff6b9d;
+        }
+
+        .pagination-link.active {
+            background: linear-gradient(135deg, #ff6b9d 0%, #4facfe 100%);
+            color: white;
+        }
+
+        .pagination-separator {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .empty-message {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        footer {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.2);
+            margin-top: 60px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+            text-align: center;
+        }
+
+        .modal-overlay.show {
+            display: block;
+        }
+
+        .modal-overlay::before {
+            content: '';
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+        }
+
+        .modal-container {
+            display: inline-block;
+            vertical-align: middle;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 45px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 107, 157, 0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .modal-icon.warning {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .modal-icon.success {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-message {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 35px;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-btn.cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(135deg, #ff6b9d 0%, #4facfe 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+        }
+
+        .modal-btn.confirm:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 107, 157, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 32px;
+            }
+
+            .search-input-field {
+                width: 250px;
+            }
+
+            .order-table {
+                font-size: 12px;
+            }
+
+            .order-table th, .order-table td {
+                padding: 10px 5px;
+            }
+
+            .btn-cancel, .btn-receive, .btn-detail {
+                padding: 6px 12px;
+                font-size: 11px;
+                margin-right: 4px;
+            }
+
+            .pagination-container {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="gradient-circle circle-pink"></div>
+        <div class="gradient-circle circle-blue"></div>
+        <div class="gradient-circle circle-purple"></div>
+    </div>
+
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid" style="font-size:1.2em; padding-top:10px; padding-left:50px; padding-right:50px;">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-example">
+                    <span class="sr-only">切换导航</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" th:href="@{/goods/goodsList}">🍰 蛋糕系统</a>
+            </div>
+            <div class="collapse navbar-collapse navbar-collapse-example">
+                <ul class="nav navbar-nav">
+                    <li><a th:href="@{/goods/goodsList}">首页</a></li>
+                    <li class="active"><a th:href="@{/order/orderList}">我的订单</a></li>
+                    <li><a th:href="@{/user/loginout}">退出登录</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a th:href="@{/cart/myCart}">
+                        <i class="fas fa-shopping-cart" style="font-size:1.5em;"></i>
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <h1 class="page-title">📦 我的订单</h1>
+
+            <div class="search-container">
+                <form id="searchForm" action="/order/orderList" method="get">
+                    <input type="hidden" name="currentPage" value="0">
+                    <div class="search-bar">
+                        <div class="search-input-wrapper">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" name="searchKeyword" id="searchKeyword" class="search-input-field" 
+                                   placeholder="输入订单号或收货人姓名搜索" 
+                                   th:value="${searchKeyword}">
+                        </div>
+                        <button type="submit" class="btn-search">搜索</button>
+                        <button type="button" id="btnReset" class="btn-reset">重置</button>
+                    </div>
+                </form>
+            </div>
+
+            <th:block th:if="${orderList != null && !orderList.isEmpty()}">
+                <table class="order-table">
+                    <thead>
+                        <tr>
+                            <th>订单号</th>
+                            <th>商品数量</th>
+                            <th>总价</th>
+                            <th>订单状态</th>
+                            <th>支付方式</th>
+                            <th>姓名</th>
+                            <th>地址</th>
+                            <th>联系方式</th>
+                            <th>付款时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${orderList}">
+                            <td th:text="${order.id}"></td>
+                            <td th:text="${order.amount}"></td>
+                            <td>¥<span th:text="${order.total}"></span></td>
+                            <td>
+                                <span th:class="|status-badge ${order.status == 2 ? 'status-paid' : (order.status == 3 ? 'status-shipped' : 'status-completed')}|">
+                                    <span th:text="${order.status == 2 ? '已支付' : (order.status == 3 ? '已发货' : '已完成')}"></span>
+                                </span>
+                            </td>
+                            <td th:text="${order.paytype == 1 ? '微信支付' : '支付宝'}"></td>
+                            <td th:text="${order.name}"></td>
+                            <td th:text="${order.address}"></td>
+                            <td th:text="${order.phone}"></td>
+                            <td th:text="${order.datetime}"></td>
+                            <td>
+                                <th:block th:if="${order.status == 2}">
+                                    <button class="btn-cancel" th:onclick="cancelOrder([[${order.id}]])">取消订单</button>
+                                </th:block>
+                                <th:block th:if="${order.status == 3}">
+                                    <button class="btn-receive" th:onclick="confirmReceive([[${order.id}]])">确认收货</button>
+                                </th:block>
+                                <button class="btn-detail" th:onclick="viewDetail([[${order.id}]])">查看详情</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination-container">
+                    <span class="pagination-info">
+                        总共 <span th:text="${totalCount}"></span> 条记录 | 
+                        总共 <span th:text="${pageCount}"></span> 页 | 
+                        当前第 <span th:text="${currentPage + 1}"></span> 页
+                    </span>
+                    <span class="pagination-separator">|</span>
+                    <a href="javascript:pageHome()" class="pagination-link">首页</a>
+                    <span class="pagination-separator">|</span>
+                    <a href="javascript:pagePre()" class="pagination-link">上一页</a>
+                    <span class="pagination-separator">|</span>
+                    <a href="javascript:pageNext()" class="pagination-link">下一页</a>
+                    <span class="pagination-separator">|</span>
+                    <a href="javascript:pageEnd()" class="pagination-link">尾页</a>
+                </div>
+            </th:block>
+
+            <th:block th:if="${totalCount == null || totalCount == 0}">
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <h3 class="empty-title">暂无订单</h3>
+                    <p class="empty-message">您还没有任何订单记录</p>
+                </div>
+            </th:block>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 蛋糕系统 - 用心烘焙每一份甜蜜</p>
+    </footer>
+
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-container">
+            <div id="modalIcon" class="modal-icon warning">
+                <span id="modalIconText">⚠️</span>
+            </div>
+            <h3 id="modalTitle" class="modal-title">确认操作</h3>
+            <p id="modalMessage" class="modal-message"></p>
+            <div class="modal-buttons">
+                <button id="modalCancel" class="modal-btn cancel" onclick="closeModal()">取消</button>
+                <button id="modalConfirm" class="modal-btn confirm" onclick="confirmAction()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var currentPage = [[${currentPage}]];
+        var pageCount = [[${pageCount}]];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var resetBtn = document.getElementById('btnReset');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    document.getElementById('searchKeyword').value = '';
+                    document.getElementById('searchForm').submit();
+                });
+            }
+        });
+
+        function viewDetail(id) {
+            location.href = '/order/orderDetail?id=' + id;
+        }
+
+        var pendingAction = null;
+
+        function cancelOrder(id) {
+            pendingAction = {
+                type: 'cancel',
+                url: '/order/cancelOrder?id=' + id
+            };
+            showModal('⚠️', '取消订单', '确定要取消该订单吗？取消后商品将重新加入购物车。', 'warning');
+        }
+
+        function confirmReceive(id) {
+            pendingAction = {
+                type: 'receive',
+                url: '/order/orderUpdate?id=' + id + '&status=4'
+            };
+            showModal('✅', '确认收货', '确定已收到货物吗？', 'success');
+        }
+
+        function showModal(icon, title, message, type) {
+            document.getElementById('modalIconText').textContent = icon;
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('modalIcon').className = 'modal-icon ' + type;
+            document.getElementById('confirmModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            document.body.style.overflow = '';
+            pendingAction = null;
+        }
+
+        function confirmAction() {
+            if (pendingAction) {
+                location.href = pendingAction.url;
+            }
+        }
+
+        function buildUrl(page) {
+            var url = '/order/orderList?currentPage=' + page;
+            var keyword = document.getElementById('searchKeyword').value;
+            if (keyword && keyword.trim()) {
+                url += '&searchKeyword=' + encodeURIComponent(keyword.trim());
+            }
+            return url;
+        }
+
+        function pageHome() {
+            if (currentPage == 0) {
+                new $.zui.Messager('已经是首页了！', {
+                    icon: 'bell-alt',
+                    type: 'warning',
+                    placement: 'center'
+                }).show();
+            } else {
+                location.href = buildUrl(0);
+            }
+        }
+
+        function pagePre() {
+            if (currentPage == 0) {
+                new $.zui.Messager('已经是第一页！', {
+                    placement: 'center',
+                    icon: 'bell',
+                    type: 'warning'
+                }).show();
+            } else {
+                location.href = buildUrl(currentPage - 1);
+            }
+        }
+
+        function pageNext() {
+            if (currentPage + 1 >= pageCount) {
+                new $.zui.Messager('已经是最后一页！', {
+                    placement: 'center',
+                    icon: 'bell',
+                    type: 'warning'
+                }).show();
+            } else {
+                location.href = buildUrl(currentPage + 1);
+            }
+        }
+
+        function pageEnd() {
+            if (currentPage + 1 >= pageCount) {
+                new $.zui.Messager('已经是最后一页！', {
+                    placement: 'center',
+                    icon: 'bell',
+                    type: 'warning'
+                }).show();
+            } else {
+                location.href = buildUrl(pageCount - 1);
+            }
+        }
+    </script>
+</body>
+</html>

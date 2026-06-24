@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>购物车 - 蛋糕系统</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+    <link type="text/css" rel="stylesheet" th:href="@{/css/main.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/zui.min.css}">
+    <script type="text/javascript" th:src="@{/js/jquery-3.0.0.js}"></script>
+    <script type="text/javascript" th:src="@{/js/zui.min.js}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .gradient-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .circle-pink {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #ff6b9d 0%, #c44569 100%);
+            top: -250px;
+            left: -150px;
+        }
+
+        .circle-blue {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #4facfe 0%, #00f2fe 100%);
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        .circle-purple {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #a8edea 0%, #fed6e3 100%);
+            top: 30%;
+            left: 60%;
+            animation-delay: -10s;
+        }
+
+        .circle-gold {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #ffd93d 0%, #ff9500 100%);
+            top: 60%;
+            left: 10%;
+            animation-delay: -3s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        .cake-decoration {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.15;
+            animation: floatCake 8s infinite ease-in-out;
+        }
+
+        .cake-1 { top: 10%; left: 5%; animation-delay: 0s; }
+        .cake-2 { top: 25%; right: 10%; animation-delay: -2s; }
+        .cake-3 { bottom: 30%; left: 15%; animation-delay: -4s; }
+        .cake-4 { bottom: 15%; right: 5%; animation-delay: -6s; }
+        .cake-5 { top: 45%; left: 80%; animation-delay: -1s; }
+
+        @keyframes floatCake {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        nav {
+            position: relative;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.5em !important;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe, #a8edea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-nav > li > a {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav > li > a:hover {
+            color: #ff6b9d !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b9d 0%, #4facfe 100%) !important;
+            border: none !important;
+            border-radius: 30px !important;
+            padding: 10px 30px !important;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.5);
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding: 60px 20px;
+            min-height: calc(100vh - 100px);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe, #a8edea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .cart-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .cart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .cart-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .checkbox-wrapper {
+            position: relative;
+        }
+
+        .checkbox-custom {
+            width: 22px;
+            height: 22px;
+            border: 2px solid rgba(255, 107, 157, 0.5);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .checkbox-custom:hover {
+            border-color: #ff6b9d;
+            background: rgba(255, 107, 157, 0.2);
+        }
+
+        .checkbox-custom.checked {
+            background: linear-gradient(135deg, #ff6b9d, #4facfe);
+            border-color: transparent;
+        }
+
+        .checkbox-custom.checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+        }
+
+        .select-all-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .select-all-text:hover {
+            color: #ff6b9d;
+        }
+
+        .cart-empty {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .empty-message {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 30px;
+        }
+
+        .btn-shopping {
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #4facfe 100%);
+            color: white;
+            border: none;
+            border-radius: 35px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn-shopping:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 107, 157, 0.5);
+        }
+
+        .cart-items {
+            padding: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 25px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            gap: 20px;
+        }
+
+        .cart-item:hover {
+            border-color: rgba(255, 107, 157, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .item-checkbox {
+            flex-shrink: 0;
+        }
+
+        .item-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .item-intro {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .item-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ff6b9d;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .qty-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:hover {
+            background: rgba(255, 107, 157, 0.3);
+            border-color: #ff6b9d;
+            color: #ff6b9d;
+        }
+
+        .qty-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .item-total {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .item-actions {
+            min-width: 80px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-delete {
+            padding: 10px 18px;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            color: #ff6b6b;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-delete:hover {
+            background: rgba(255, 107, 107, 0.3);
+            border-color: #ff6b6b;
+        }
+
+        .cart-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 25px 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-info {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        .footer-info span {
+            color: #ff6b9d;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .footer-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .total-section {
+            text-align: right;
+        }
+
+        .total-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .total-amount {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-checkout {
+            padding: 16px 50px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+            color: white;
+            border: none;
+            border-radius: 35px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-checkout:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.5);
+        }
+
+        .btn-checkout:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .footer {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.2);
+            margin-top: 60px;
+        }
+
+        .delete-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .delete-popup {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .delete-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .delete-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .delete-message {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+        }
+
+        .delete-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-cancel, .btn-confirm {
+            padding: 12px 35px;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+        }
+
+        #deleteForm {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .cart-item {
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
+            
+            .item-checkbox {
+                order: 1;
+            }
+            
+            .item-image {
+                order: 2;
+            }
+            
+            .item-info {
+                order: 3;
+                width: calc(100% - 120px);
+                margin-left: 20px;
+            }
+            
+            .item-price {
+                order: 4;
+                width: 100%;
+                text-align: left;
+                margin-top: 10px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                padding-top: 10px;
+            }
+            
+            .item-quantity {
+                order: 5;
+                width: 100%;
+                justify-content: flex-start;
+                margin-top: 10px;
+            }
+            
+            .item-total {
+                order: 6;
+                width: 100%;
+                text-align: left;
+                margin-top: 10px;
+            }
+            
+            .item-actions {
+                order: 7;
+                width: 100%;
+                justify-content: flex-start;
+                margin-top: 10px;
+            }
+            
+            .cart-footer {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .footer-left {
+                width: 100%;
+            }
+            
+            .footer-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+
+    <script type="text/javascript">
+        var deleteCartId = 0;
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 80;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.width = (Math.random() * 3 + 1) + 'px';
+                star.style.height = star.style.width;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function toggleSelectAll() {
+            const headerCheckbox = document.querySelector('.cart-header .checkbox-custom');
+            headerCheckbox.classList.toggle('checked');
+            const allChecked = headerCheckbox.classList.contains('checked');
+            const itemCheckboxes = document.querySelectorAll('.item-checkbox .checkbox-custom');
+            
+            itemCheckboxes.forEach(checkbox => {
+                if (allChecked) {
+                    checkbox.classList.add('checked');
+                } else {
+                    checkbox.classList.remove('checked');
+                }
+            });
+            updateTotalAmount();
+        }
+
+        function toggleCheckbox(element) {
+            element.classList.toggle('checked');
+            updateSelectAll();
+            updateTotalAmount();
+        }
+
+        function updateTotalAmount() {
+            var total = 0;
+            var checkedCount = 0;
+            var checkboxes = document.querySelectorAll('.item-checkbox .checkbox-custom');
+            
+            checkboxes.forEach(function(checkbox) {
+                if (checkbox.classList.contains('checked')) {
+                    var cartItem = checkbox.closest('.cart-item');
+                    var priceElement = cartItem.querySelector('.item-total span');
+                    if (priceElement) {
+                        total += parseFloat(priceElement.textContent) || 0;
+                        checkedCount++;
+                    }
+                }
+            });
+            
+            document.getElementById('selectedCount').textContent = checkedCount;
+            document.querySelector('.total-amount').innerHTML = '¥' + total.toFixed(2);
+            
+            var checkoutBtn = document.getElementById('checkoutBtn');
+            checkoutBtn.disabled = checkedCount === 0;
+        }
+
+        function updateSelectAll() {
+            const itemCheckboxes = document.querySelectorAll('.item-checkbox .checkbox-custom');
+            const allChecked = Array.from(itemCheckboxes).every(cb => cb.classList.contains('checked'));
+            const headerCheckbox = document.querySelector('.cart-header .checkbox-custom');
+            
+            if (allChecked) {
+                headerCheckbox.classList.add('checked');
+            } else {
+                headerCheckbox.classList.remove('checked');
+            }
+        }
+
+        function showDeleteConfirm(button) {
+            var cartId = button.getAttribute('data-cart-id');
+            deleteCartId = parseInt(cartId);
+            console.log('Cart ID:', deleteCartId);
+            var overlay = document.getElementById('deleteOverlay');
+            console.log('Overlay element:', overlay);
+            overlay.style.display = 'flex';
+        }
+
+        function hideDeleteConfirm() {
+            document.getElementById('deleteOverlay').style.display = 'none';
+            deleteCartId = 0;
+        }
+
+        function confirmDelete() {
+            if (deleteCartId > 0) {
+                document.getElementById('deleteCartId').value = deleteCartId;
+                document.getElementById('deleteForm').submit();
+            }
+            hideDeleteConfirm();
+        }
+
+        function submitCheckout() {
+            var checkedCartIds = [];
+            var checkboxes = document.querySelectorAll('.item-checkbox .checkbox-custom');
+            
+            checkboxes.forEach(function(checkbox, index) {
+                if (checkbox.classList.contains('checked')) {
+                    var cartItem = checkbox.closest('.cart-item');
+                    var deleteBtn = cartItem.querySelector('.btn-delete');
+                    if (deleteBtn) {
+                        checkedCartIds.push(deleteBtn.getAttribute('data-cart-id'));
+                    }
+                }
+            });
+            
+            if (checkedCartIds.length > 0) {
+                document.getElementById('checkoutCartIds').value = checkedCartIds.join(',');
+                document.getElementById('checkoutForm').submit();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            toggleSelectAll();
+        });
+    </script>
+    
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="gradient-circle circle-pink"></div>
+        <div class="gradient-circle circle-blue"></div>
+        <div class="gradient-circle circle-purple"></div>
+        <div class="gradient-circle circle-gold"></div>
+        <div class="stars" id="stars"></div>
+        <span class="cake-decoration cake-1">🍰</span>
+        <span class="cake-decoration cake-2">🧁</span>
+        <span class="cake-decoration cake-3">🍪</span>
+        <span class="cake-decoration cake-4">🍩</span>
+        <span class="cake-decoration cake-5">🍫</span>
+    </div>
+
+    <nav class="navbar navbar-inverse" role="navigation">
+      <div class="container-fluid" style="font-size:1.2em; padding-top:10px; padding-left:50px; padding-right:50px;">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-example">
+            <span class="sr-only">切换导航</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" th:href="@{/goods/goodsList}">🍰 蛋糕系统</a>
+        </div> 
+        <div class="collapse navbar-collapse navbar-collapse-example" >
+          <ul class="nav navbar-nav">
+            <li><a th:href="@{/goods/goodsList}">首页</a></li>
+            <li class="active"><a th:href="@{/cart/myCart}">购物车</a></li>
+            <li><a th:href="@{/register}">注册</a></li>
+            <li><a th:href="@{/user/loginout}">退出登录</a></li>
+            <li><a th:href="@{/order/orderList}">我的订单</a></li>
+          </ul>
+          
+          <ul class="nav navbar-nav navbar-right">
+              <li><a th:href="@{/cart/myCart}">
+                  <i class="fas fa-shopping-cart" style="font-size:1.5em;"></i>
+                  <span class="label label-badge label-success" style="margin-bottom:6px;" th:text="${totalCount}"></span>
+              </a></li>
+          </ul>
+                
+        </div>
+      </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">🛒 我的购物车</h1>
+            <p class="page-subtitle">精心挑选的美味蛋糕，等待您的光临</p>
+        </div>
+
+        <div class="cart-container">
+            <div class="cart-header">
+                <div class="cart-header-left">
+                    <div class="checkbox-wrapper">
+                        <div class="checkbox-custom" onclick="toggleSelectAll()"></div>
+                    </div>
+                    <span class="select-all-text" onclick="toggleSelectAll()">全选</span>
+                </div>
+                <div class="footer-info">
+                    共 <span th:text="${totalCount}"></span> 件商品
+                </div>
+            </div>
+
+            <div class="cart-items">
+                <div th:if="${cartList != null && !cartList.isEmpty()}">
+                    <div th:each="cart : ${cartList}" class="cart-item">
+                        <div class="item-checkbox checkbox-wrapper">
+                            <div class="checkbox-custom" onclick="toggleCheckbox(this)"></div>
+                        </div>
+                        
+                        <div class="item-image">
+                            <img th:src="@{${cart.cover}}" th:alt="${cart.intro}">
+                        </div>
+                        
+                        <div class="item-info">
+                            <div class="item-name" th:text="${cart.name}"></div>
+                            <div class="item-intro" th:text="${cart.intro}"></div>
+                        </div>
+                        
+                        <div class="item-price">¥<span th:text="${cart.price}"></span></div>
+                        
+                        <div class="item-quantity">
+                            <button class="qty-btn" th:onclick="location.href='/cart/updateAmount?cartId=' + [[${cart.id}]] + '&action=decrease'">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span class="qty-value" th:text="${cart.amount}"></span>
+                            <button class="qty-btn" th:onclick="location.href='/cart/updateAmount?cartId=' + [[${cart.id}]] + '&action=increase'">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="item-total">¥<span th:text="${cart.total_price}"></span></div>
+                        
+                        <div class="item-actions">
+                            <button class="btn-delete" th:data-cart-id="${cart.id}" onclick="showDeleteConfirm(this)">
+                                <i class="fas fa-trash"></i> 删除
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${cartList == null || cartList.isEmpty()}">
+                    <div class="cart-empty">
+                        <div class="empty-icon">🛒</div>
+                        <h3 class="empty-title">购物车空空如也</h3>
+                        <p class="empty-message">快去挑选美味的蛋糕吧~</p>
+                        <button class="btn-shopping" onclick="location.href='/goods/goodsList'">去购物</button>
+                    </div>
+                </div>
+            </div>
+
+            <th:block th:if="${cartList != null && !cartList.isEmpty()}">
+                <div class="cart-footer">
+                    <div class="footer-left">
+                        <span class="footer-info">已选 <span id="selectedCount">0</span> 件商品</span>
+                    </div>
+                    <div class="footer-right">
+                        <div class="total-section">
+                            <div class="total-label">合计</div>
+                            <div class="total-amount">¥<span th:text="${totalAmount}"></span></div>
+                        </div>
+                        <button class="btn-checkout" id="checkoutBtn" disabled onclick="submitCheckout()">
+                            <i class="fas fa-credit-card"></i> 立即支付
+                        </button>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2026 蛋糕系统 - 用心烘焙每一份甜蜜</p>
+    </div>
+
+    <div class="delete-overlay" id="deleteOverlay">
+        <div class="delete-popup">
+            <div class="delete-icon">⚠️</div>
+            <h3 class="delete-title">确认删除</h3>
+            <p class="delete-message">您确定要删除这件商品吗？此操作不可撤销。</p>
+            <div class="delete-actions">
+                <button class="btn-cancel" onclick="hideDeleteConfirm()">取消</button>
+                <button class="btn-confirm" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <form id="deleteForm" action="/cart/deleteCart" method="post">
+        <input type="hidden" id="deleteCartId" name="cartId">
+    </form>
+    
+    <form id="checkoutForm" action="/payment/checkout" method="post">
+        <input type="hidden" id="checkoutCartIds" name="cartIds">
+    </form>
+</body>
+</html>

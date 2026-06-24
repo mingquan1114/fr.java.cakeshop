@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Aether Sweets - Welcome</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fef3c7 100%); 
+            min-height: 100vh; 
+            overflow: hidden; 
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        #chart { 
+            width: 100%; 
+            height: 100vh; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+        }
+        .loading-text {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+        }
+        .loading-text p {
+            font-size: 14px;
+            color: #7c3aed;
+            font-weight: 500;
+            letter-spacing: 2px;
+            animation: fadeInOut 2s ease-in-out infinite;
+        }
+        .progress-bar {
+            width: 120px;
+            height: 3px;
+            background: rgba(124, 58, 237, 0.2);
+            border-radius: 2px;
+            margin: 12px auto 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #f472b6, #f59e0b, #f472b6);
+            background-size: 200% 100%;
+            border-radius: 2px;
+            animation: progress 3s ease-in-out forwards;
+        }
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        @keyframes progress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="chart"></div>
+    <div class="loading-text">
+        <p>正在进入 Aether Sweets...</p>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script>
+        var chart = echarts.init(document.getElementById('chart'));
+        
+        var chars = ['A', 'e', 't', 'h', 'e', 'r', ' ', 'S', 'w', 'e', 'e', 't', 's'];
+        var fontSize = 48;
+        var textColors = ['#ec4899', '#f472b6', '#f9a8d4', '#f59e0b', '#fbbf24', '#fcd34d', '#7c3aed', '#a78bfa'];
+        var shapes = [];
+        
+        function getRandomColor() {
+            return textColors[Math.floor(Math.random() * textColors.length)];
+        }
+        
+        chars.forEach(function (char, idx) {
+            var x = (idx + 1) * (650 / (chars.length + 1)) + 120;
+            var y = 280;
+            
+            shapes.push({
+                type: 'text',
+                style: {
+                    text: char,
+                    fontSize: fontSize,
+                    fontWeight: 'bold',
+                    fill: 'transparent',
+                    stroke: getRandomColor(),
+                    lineWidth: 3,
+                    textAlign: 'center'
+                },
+                left: x,
+                top: y,
+                origin: [fontSize / 2, fontSize],
+                animation: {
+                    duration: 2500,
+                    easing: 'elasticOut',
+                    delay: idx * 120,
+                    keyframes: [
+                        { percent: 0, scaleX: 0, scaleY: 0, opacity: 0 },
+                        { percent: 0.3, scaleX: 1.2, scaleY: 1.2, opacity: 1 },
+                        { percent: 0.5, scaleX: 0.9, scaleY: 0.9 },
+                        { percent: 0.7, scaleX: 1.05, scaleY: 1.05 },
+                        { percent: 1, scaleX: 1, scaleY: 1, opacity: 1 }
+                    ]
+                }
+            });
+            
+            shapes.push({
+                type: 'circle',
+                style: {
+                    fill: 'transparent',
+                    stroke: getRandomColor(),
+                    lineWidth: 2
+                },
+                left: x,
+                top: y + 80,
+                shape: { r: 15 },
+                animation: {
+                    duration: 2000,
+                    easing: 'elasticOut',
+                    delay: idx * 120 + 300,
+                    keyframes: [
+                        { percent: 0, scale: 0, opacity: 0 },
+                        { percent: 0.5, scale: 1.3, opacity: 1 },
+                        { percent: 1, scale: 1, opacity: 0.7 }
+                    ]
+                }
+            });
+            
+            shapes.push({
+                type: 'polygon',
+                style: {
+                    fill: 'transparent',
+                    stroke: getRandomColor(),
+                    lineWidth: 2
+                },
+                left: x,
+                top: y + 140,
+                shape: {
+                    points: [[0, -12], [10, 8], [-10, 8]]
+                },
+                animation: {
+                    duration: 1800,
+                    easing: 'elasticOut',
+                    delay: idx * 120 + 500,
+                    keyframes: [
+                        { percent: 0, scale: 0, opacity: 0, rotate: -180 },
+                        { percent: 0.6, scale: 1.2, opacity: 1, rotate: 0 },
+                        { percent: 1, scale: 1, opacity: 0.6, rotate: 0 }
+                    ]
+                }
+            });
+        });
+        
+        for (var i = 0; i < 15; i++) {
+            shapes.push({
+                type: 'circle',
+                style: {
+                    fill: textColors[Math.floor(Math.random() * textColors.length)],
+                    opacity: 0.3
+                },
+                left: Math.random() * 800,
+                top: Math.random() * 600,
+                shape: { r: Math.random() * 8 + 2 },
+                animation: {
+                    duration: 3000 + Math.random() * 2000,
+                    easing: 'cubicInOut',
+                    delay: Math.random() * 2000,
+                    loop: true,
+                    keyframes: [
+                        { percent: 0, scale: 0, opacity: 0 },
+                        { percent: 0.3, scale: 1, opacity: 0.5 },
+                        { percent: 0.7, scale: 1, opacity: 0.3 },
+                        { percent: 1, scale: 0, opacity: 0 }
+                    ]
+                }
+            });
+        }
+        
+        for (var i = 0; i < 8; i++) {
+            shapes.push({
+                type: 'line',
+                style: {
+                    stroke: textColors[Math.floor(Math.random() * textColors.length)],
+                    lineWidth: 2,
+                    opacity: 0.4
+                },
+                left: 0,
+                top: 0,
+                shape: {
+                    x1: Math.random() * 800,
+                    y1: Math.random() * 200 + 100,
+                    x2: Math.random() * 800,
+                    y2: Math.random() * 200 + 300
+                },
+                animation: {
+                    duration: 4000,
+                    easing: 'linear',
+                    delay: Math.random() * 1500,
+                    loop: true,
+                    keyframes: [
+                        { percent: 0, opacity: 0 },
+                        { percent: 0.2, opacity: 0.6 },
+                        { percent: 0.8, opacity: 0.6 },
+                        { percent: 1, opacity: 0 }
+                    ]
+                }
+            });
+        }
+        
+        chart.setOption({
+            backgroundColor: 'transparent',
+            graphic: shapes
+        });
+        
+        function getUrlParam(name) {
+            var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)');
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURI(r[2]);
+            return null;
+        }
+        
+        setTimeout(function() {
+            var isAdmin = getUrlParam('admin');
+            if (isAdmin === '1') {
+                window.location.href = '/admin/index';
+            } else {
+                window.location.href = '/goods/goodsList';
+            }
+        }, 3500);
+        
+        window.addEventListener('resize', function() {
+            chart.resize();
+        });
+    </script>
+</body>
+</html>

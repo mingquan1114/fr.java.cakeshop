@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>骑士端 - 消息通知</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/css/knight.css">
+    <style>
+        .msg-list {
+            padding: var(--spacing-md) var(--spacing-lg) calc(var(--spacing-xl) * 4);
+        }
+        
+        .msg-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            gap: var(--spacing-lg);
+            align-items: flex-start;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-normal);
+            cursor: pointer;
+        }
+        
+        .msg-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateX(4px);
+        }
+        
+        .msg-card.unread {
+            border-left: 4px solid var(--primary-color);
+            background: linear-gradient(90deg, rgba(255, 107, 53, 0.03), transparent);
+        }
+        
+        .msg-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .msg-icon.order { 
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color)); 
+            color: #ffffff; 
+        }
+        .msg-icon.system { 
+            background: linear-gradient(135deg, var(--color-blue), #0099ff); 
+            color: #ffffff; 
+        }
+        .msg-icon.warn { 
+            background: linear-gradient(135deg, var(--secondary-color), #ff8c00); 
+            color: #ffffff; 
+        }
+        .msg-icon.success { 
+            background: linear-gradient(135deg, var(--color-green), #38f9d7); 
+            color: #ffffff; 
+        }
+        
+        .msg-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .msg-title {
+            font-size: var(--font-md);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+        
+        .msg-text {
+            font-size: var(--font-sm);
+            color: var(--text-muted);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .msg-time {
+            font-size: var(--font-xs);
+            color: var(--text-light);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .msg-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            flex-shrink: 0;
+            margin-top: var(--spacing-sm);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔔 消息通知</h1>
+    </div>
+
+    <div class="msg-list">
+        <div class="msg-card unread">
+            <div class="msg-icon order"><i class="fas fa-box"></i></div>
+            <div class="msg-content">
+                <div class="msg-title">新订单通知</div>
+                <div class="msg-text">您有一个新的配送订单待接单，请及时处理</div>
+                <div class="msg-time">2026-06-15 09:30</div>
+            </div>
+            <div class="msg-dot"></div>
+        </div>
+        
+        <div class="msg-card">
+            <div class="msg-icon system"><i class="fas fa-bullhorn"></i></div>
+            <div class="msg-content">
+                <div class="msg-title">系统通知</div>
+                <div class="msg-text">配送规则已更新，请查看最新配送要求</div>
+                <div class="msg-time">2026-06-14 18:00</div>
+            </div>
+        </div>
+        
+        <div class="msg-card">
+            <div class="msg-icon warn"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="msg-content">
+                <div class="msg-title">配送提醒</div>
+                <div class="msg-text">订单 #20260615001 即将超时，请尽快完成配送</div>
+                <div class="msg-time">2026-06-14 15:30</div>
+            </div>
+        </div>
+        
+        <div class="msg-card">
+            <div class="msg-icon success"><i class="fas fa-truck"></i></div>
+            <div class="msg-content">
+                <div class="msg-title">订单完成</div>
+                <div class="msg-text">订单 #20260614005 已成功送达，收入 +¥25.00</div>
+                <div class="msg-time">2026-06-14 14:20</div>
+            </div>
+        </div>
+        
+        <div class="msg-card">
+            <div class="msg-icon system"><i class="fas fa-info-circle"></i></div>
+            <div class="msg-content">
+                <div class="msg-title">账户通知</div>
+                <div class="msg-text">本周配送奖励已发放，请查收</div>
+                <div class="msg-time">2026-06-13 10:00</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="empty-state" style="display:none;">
+        <i class="far fa-bell"></i>
+        <p>暂无消息</p>
+    </div>
+
+    <div class="bottom-nav">
+        <a th:href="@{/knight/index}" class="nav-item">
+            <i class="fas fa-home"></i><span>首页</span>
+        </a>
+        <a th:href="@{/knight/income}" class="nav-item">
+            <i class="fas fa-coins"></i><span>收入</span>
+        </a>
+        <a th:href="@{/knight/message}" class="nav-item active">
+            <i class="fas fa-bell"></i><span>消息</span>
+        </a>
+        <a th:href="@{/knight/profile}" class="nav-item">
+            <i class="fas fa-user"></i><span>我的</span>
+        </a>
+    </div>
+</body>
+</html>

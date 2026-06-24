@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库服务
+  mysql:
+    image: mysql:5.7
+    container_name: cake_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cakeshop
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_INITDB_SKIP_TZINFO: "1"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./cakeshop.sql:/docker-entrypoint-initdb.d/01_cakeshop.sql
+      - ./src/main/resources/knight.sql:/docker-entrypoint-initdb.d/02_knight.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  # 蛋糕管理系统应用服务
+  cake-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cake_app
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/cakeshop?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    links:
+      - mysql
+
+# 数据卷
+volumes:
+  mysql_data:

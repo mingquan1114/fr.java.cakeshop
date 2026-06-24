@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{admin.dashboard.title}">管理员控制台 - 蛋糕系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+</head>
+<body>
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header"><i class="fas fa-birthday-cake"></i><span th:text="#{admin.sidebar.title}">蛋糕管理系统</span></div>
+        <div class="menu-sep" th:text="#{admin.sidebar.mainMenu}">主菜单</div>
+        <ul class="menu-item">
+            <li th:class="${currentPage == 'index' ? 'active' : ''}">
+                <a href="/admin/index"><i class="fas fa-tachometer-alt"></i><span th:text="#{admin.sidebar.dashboard}">控制台</span></a>
+            </li>
+            <li th:class="${currentPage == 'userList' ? 'active open' : ''}">
+                <a href="#"><i class="fas fa-users"></i><span th:text="#{admin.sidebar.userManagement}">用户管理</span></a>
+                <ul class="submenu">
+                    <li><a href="/admin/userList" th:class="${currentPage == 'userList' ? 'active-sub' : ''}" th:text="#{admin.sidebar.userList}">用户列表</a></li>
+                </ul>
+            </li>
+            <li th:class="${currentPage == 'goodsList' || currentPage == 'addGoods' ? 'active open' : ''}">
+                <a href="#"><i class="fas fa-boxes"></i><span th:text="#{admin.sidebar.goodsManagement}">商品管理</span></a>
+                <ul class="submenu">
+                    <li><a href="/admin/goodsList" th:class="${currentPage == 'goodsList' ? 'active-sub' : ''}" th:text="#{admin.sidebar.goodsList}">商品列表</a></li>
+                    <li><a href="/admin/addGoods" th:class="${currentPage == 'addGoods' ? 'active-sub' : ''}" th:text="#{admin.sidebar.addGoods}">新增商品</a></li>
+                </ul>
+            </li>
+            <li th:class="${currentPage == 'typeList' ? 'active open' : ''}">
+                <a href="#"><i class="fas fa-tags"></i><span th:text="#{admin.sidebar.categoryManagement}">分类管理</span></a>
+                <ul class="submenu">
+                    <li><a href="/admin/typeList" th:class="${currentPage == 'typeList' ? 'active-sub' : ''}" th:text="#{admin.sidebar.categoryList}">分类列表</a></li>
+                </ul>
+            </li>
+            <li th:class="${currentPage == 'orderList' ? 'active open' : ''}">
+                <a href="#"><i class="fas fa-shopping-cart"></i><span th:text="#{admin.sidebar.orderManagement}">订单管理</span></a>
+                <ul class="submenu">
+                    <li><a href="/admin/orderList" th:class="${currentPage == 'orderList' ? 'active-sub' : ''}" th:text="#{admin.sidebar.allOrders}">所有订单</a></li>
+                </ul>
+            </li>
+            <li th:class="${currentPage == 'adminSetting' || currentPage == 'logList' ? 'active open' : ''}"><a href="/admin/adminSetting"><i class="fas fa-cogs"></i><span th:text="#{admin.sidebar.systemManagement}">系统管理</span></a><ul class="submenu"><li><a href="/admin/adminSetting" th:class="${currentPage == 'adminSetting' ? 'active-sub' : ''}" th:text="#{admin.sidebar.adminSettings}">管理员设置</a></li><li><a href="/admin/logList" th:class="${currentPage == 'logList' ? 'active-sub' : ''}" th:text="#{admin.sidebar.logManagement}">日志管理</a></li></ul></li>
+        </ul>
+        
+        <div class="ai-assistant">
+            <div class="ai-avatar" onclick="openAIChat()">
+                <img src="/images/1781227633000.gif" alt="AI助手" />
+                <div class="ai-pulse"></div>
+            </div>
+            <div class="ai-label">AI客服</div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <h1><i class="fas fa-tachometer-alt"></i><span th:text="#{admin.dashboard.title}">管理员控制台</span></h1>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"><i class="fas fa-sun" id="themeIcon"></i><span id="themeLabel" th:text="#{admin.theme.light}">日间模式</span></button>
+                <div class="lang-switch">
+                    <select id="langSelect" onchange="switchLang(this.value)">
+                        <option value="zh" th:text="#{admin.lang.zh}" th:selected="${#locale.language == 'zh'}">中文</option>
+                        <option value="en" th:text="#{admin.lang.en}" th:selected="${#locale.language == 'en'}">English</option>
+                        <option value="ja" th:text="#{admin.lang.ja}" th:selected="${#locale.language == 'ja'}">日本語</option>
+                    </select>
+                </div>
+                <div class="admin-badge"><i class="fas fa-user-shield"></i><span th:text="#{admin.welcome}">欢迎</span>，<span th:text="${adminName}"></span></div>
+                <button class="logout-btn" onclick="location.href='/user/loginout'"><i class="fas fa-sign-out-alt"></i><span th:text="#{admin.logout}">退出</span></button>
+            </div>
+        </header>
+
+        <div class="content-body">
+            <div th:if="${msg != null}" class="toast-overlay">
+                <div class="toast-msg" th:classappend="${msg.contains('成功') || msg.contains('已') || msg.contains('通过') ? 'success' : 'error'}" id="toastMsg">
+                    <i th:class="${msg.contains('成功') || msg.contains('已') || msg.contains('通过') ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'}"></i>
+                    <span th:text="${msg}"></span>
+                </div>
+            </div>
+
+            <div class="dashboard-cards">
+                <div class="dash-card">
+                    <div class="dash-icon blue"><i class="fas fa-users"></i></div>
+                    <div class="dash-info">
+                        <div class="dash-val" th:text="${userCount}">0</div>
+                        <div class="dash-label" th:text="#{admin.dashboard.users}">用户数</div>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon green"><i class="fas fa-boxes"></i></div>
+                    <div class="dash-info">
+                        <div class="dash-val" th:text="${goodsCount}">0</div>
+                        <div class="dash-label" th:text="#{admin.dashboard.goods}">商品数</div>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon orange"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="dash-info">
+                        <div class="dash-val" th:text="${orderCount}">0</div>
+                        <div class="dash-label" th:text="#{admin.dashboard.orders}">订单数</div>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon purple"><i class="fas fa-coins"></i></div>
+                    <div class="dash-info">
+                        <div class="dash-val">¥<span th:text="${todayRevenue}">0.00</span></div>
+                        <div class="dash-label" th:text="#{admin.dashboard.revenue}">今日收入</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-panel full-width">
+                    <h3><i class="fas fa-line-chart"></i> <span th:text="#{admin.dashboard.salesTrend}">每日商品销量趋势</span></h3>
+                    <div id="salesTrendChart" class="chart-container"></div>
+                </div>
+
+                <div class="chart-panel">
+                    <h3><i class="fas fa-pie-chart"></i> <span th:text="#{admin.dashboard.paymentStats}">支付方式统计</span></h3>
+                    <div id="paymentChart" class="chart-container-sm"></div>
+                </div>
+
+                <div class="chart-panel">
+                    <h3><i class="fas fa-chart-pie"></i> <span th:text="#{admin.dashboard.salesDistribution}">商品销量分布</span></h3>
+                    <div id="goodsSalesChart" class="chart-container-sm"></div>
+                </div>
+
+                <div class="chart-panel full-width">
+                    <h3><i class="fas fa-bar-chart"></i> <span th:text="#{admin.dashboard.topGoods}">热销商品对比</span></h3>
+                    <div id="topGoodsChart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <div class="quick-panel">
+                <h3 th:text="#{admin.dashboard.quickActions}">快捷操作</h3>
+                <div class="quick-grid">
+                    <button class="quick-btn btn-blue" onclick="location.href='/admin/userList'"><i class="fas fa-users-cog"></i><span th:text="#{admin.dashboard.quick.user}">用户管理</span></button>
+                    <button class="quick-btn btn-green" onclick="location.href='/admin/addGoods'"><i class="fas fa-plus-circle"></i><span th:text="#{admin.dashboard.quick.addGoods}">新增商品</span></button>
+                    <button class="quick-btn btn-orange" onclick="location.href='/admin/orderList'"><i class="fas fa-list-alt"></i><span th:text="#{admin.dashboard.quick.orders}">订单管理</span></button>
+                    <button class="quick-btn btn-purple" onclick="location.href='/admin/typeList'"><i class="fas fa-tags"></i><span th:text="#{admin.dashboard.quick.category}">分类管理</span></button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+<style>
+.ai-assistant {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    cursor: pointer;
+}
+
+.ai-avatar {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #3b82f6;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    transition: all 0.3s ease;
+}
+
+.ai-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+}
+
+.ai-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ai-pulse {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 18px;
+    height: 18px;
+    background: #22c55e;
+    border-radius: 50%;
+    border: 3px solid #1e293b;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.ai-label {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.ai-chat-modal {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 420px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--card-border);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.ai-chat-modal.show {
+    display: block;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.ai-chat-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-chat-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.ai-chat-title img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.ai-chat-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.ai-chat-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.ai-chat-body {
+    height: 350px;
+    overflow-y: auto;
+    padding: 16px;
+    background: var(--bg);
+}
+
+.ai-chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ai-chat-message {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    line-height: 1.5;
+    font-size: 13px;
+}
+
+.ai-chat-message.user {
+    align-self: flex-end;
+    background: #3b82f6;
+    color: #fff;
+    border-bottom-right-radius: 6px;
+}
+
+.ai-chat-message.ai {
+    align-self: flex-start;
+    background: var(--card-bg);
+    color: var(--text);
+    border: 1px solid var(--card-border);
+    border-bottom-left-radius: 6px;
+    display: flex;
+    gap: 10px;
+}
+
+.ai-chat-message.ai .ai-msg-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.ai-chat-message.ai .ai-msg-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ai-chat-message.ai .ai-msg-content {
+    flex: 1;
+}
+
+.ai-chat-typing {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--card-bg);
+    border-radius: 14px;
+    margin-top: 8px;
+}
+
+.ai-chat-typing .typing-dot {
+    width: 8px;
+    height: 8px;
+    background: #94a3b8;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.ai-chat-typing .typing-dot:nth-child(1) { animation-delay: 0s; }
+.ai-chat-typing .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.ai-chat-typing .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+}
+
+.ai-chat-footer {
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border-top: 1px solid var(--card-border);
+    display: flex;
+    gap: 10px;
+}
+
+.ai-chat-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--card-border);
+    border-radius: 25px;
+    background: var(--input-bg);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.ai-chat-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.ai-chat-send {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.ai-chat-send:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.ai-chat-send:active {
+    transform: scale(0.95);
+}
+
+.ai-chat-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0);
+    z-index: 999;
+}
+
+.ai-chat-overlay.show {
+    display: block;
+}
+</style>
+
+<!-- AI Chat Modal -->
+<div class="ai-chat-overlay" id="aiChatOverlay" onclick="closeAIChat()"></div>
+<div class="ai-chat-modal" id="aiChatModal">
+    <div class="ai-chat-header">
+        <div class="ai-chat-title">
+            <img src="/images/1781227633000.gif" alt="AI助手" />
+            <span>AI智能客服</span>
+        </div>
+        <button class="ai-chat-close" onclick="closeAIChat()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="ai-chat-body" id="aiChatBody">
+        <div class="ai-chat-messages" id="aiChatMessages">
+            <div class="ai-chat-message ai">
+                <div class="ai-msg-avatar">
+                    <img src="/images/1781227633000.gif" alt="AI" />
+                </div>
+                <div class="ai-msg-content">
+                    您好！我是AI智能客服，请问有什么可以帮助您的吗？
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ai-chat-footer">
+        <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="输入消息..." onkeyup="handleKeyPress(event)" />
+        <button class="ai-chat-send" onclick="sendMessage()">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var m = document.getElementById('toastMsg');
+    if(m) setTimeout(function(){m.parentElement.remove()}, 3000);
+    
+    document.querySelectorAll('.menu-item>li>a').forEach(function(a){
+        a.addEventListener('click',function(e){
+            var li = a.parentElement, sub = li.querySelector('.submenu');
+            if(sub){e.preventDefault();li.classList.toggle('open')}
+        })
+    });
+
+    initCharts();
+});
+
+function initCharts() {
+    var days = ['6月1日', '6月2日', '6月3日', '6月4日', '6月5日', '6月6日', '6月7日'];
+    var lineData = [120, 132, 101, 134, 190, 230, 210];
+    var barData = [80, 95, 75, 105, 140, 180, 165];
+
+    var salesTrendChart = echarts.init(document.getElementById('salesTrendChart'));
+    salesTrendChart.setOption({
+        title: {
+            text: '近7日销量趋势',
+            left: 'center',
+            textStyle: { fontSize: 14, fontWeight: 'normal', color: '#64748b' }
+        },
+        tooltip: { trigger: 'axis', axisPointer: { type: 'cross', crossStyle: { color: '#999' } } },
+        legend: { data: ['订单数(线)', '销售量(柱)'], bottom: 10 },
+        grid: { left: '3%', right: '4%', bottom: '15%', top: '15%', containLabel: true },
+        xAxis: { type: 'category', data: days, axisPointer: { type: 'shadow' } },
+        yAxis: [
+            { type: 'value', name: '订单数', min: 0, max: 300, interval: 50, axisLabel: { formatter: '{value}' } },
+            { type: 'value', name: '销售量', min: 0, max: 250, interval: 50, axisLabel: { formatter: '{value}' } }
+        ],
+        series: [
+            { name: '订单数(线)', type: 'line', smooth: true, data: lineData, lineStyle: { width: 3 }, areaStyle: { opacity: 0.1 } },
+            { name: '销售量(柱)', type: 'bar', yAxisIndex: 1, data: barData, itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{offset: 0, color: '#3b82f6'}, {offset: 1, color: '#2563eb'}]) } }
+        ]
+    });
+
+    var paymentChart = echarts.init(document.getElementById('paymentChart'));
+    paymentChart.setOption({
+        title: {
+            text: '支付方式占比',
+            left: 'center',
+            textStyle: { fontSize: 14, fontWeight: 'normal', color: '#64748b' }
+        },
+        tooltip: { trigger: 'item', formatter: '{b}: {c}笔 ({d}%)' },
+        legend: { orient: 'vertical', left: 'left' },
+        series: [
+            {
+                name: '支付方式',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+                label: { show: true, formatter: '{b}: {d}%' },
+                emphasis: { label: { show: true, fontSize: 16, fontWeight: 'bold' }, itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' } },
+                data: [
+                    { value: 682, name: '微信支付', itemStyle: { color: '#22c55e' } },
+                    { value: 318, name: '支付宝', itemStyle: { color: '#3b82f6' } }
+                ]
+            }
+        ]
+    });
+
+    var goodsSalesChart = echarts.init(document.getElementById('goodsSalesChart'));
+    goodsSalesChart.setOption({
+        title: {
+            text: '分类销量占比',
+            left: 'center',
+            textStyle: { fontSize: 14, fontWeight: 'normal', color: '#64748b' }
+        },
+        tooltip: { trigger: 'item', formatter: '{b}: {c}件 ({d}%)' },
+        legend: { orient: 'vertical', left: 'left' },
+        series: [
+            {
+                name: '销量',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '50%'],
+                roseType: 'angle',
+                itemStyle: { borderRadius: 5, borderColor: '#fff', borderWidth: 2 },
+                label: { show: true },
+                emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold' } },
+                data: [
+                    { value: 335, name: '蛋糕系列', itemStyle: { color: '#f59e0b' } },
+                    { value: 278, name: '冰淇淋系列', itemStyle: { color: '#8b5cf6' } },
+                    { value: 215, name: '饼干系列', itemStyle: { color: '#ec4899' } },
+                    { value: 180, name: '面包系列', itemStyle: { color: '#06b6d4' } },
+                    { value: 145, name: '甜点系列', itemStyle: { color: '#22c55e' } }
+                ]
+            }
+        ]
+    });
+
+    var topGoodsChart = echarts.init(document.getElementById('topGoodsChart'));
+    topGoodsChart.setOption({
+        title: {
+            text: '热销商品日对比',
+            left: 'center',
+            textStyle: { fontSize: 14, fontWeight: 'normal', color: '#64748b' }
+        },
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        legend: { data: ['昨日销量', '今日销量'], bottom: 10 },
+        grid: { left: '3%', right: '4%', bottom: '15%', top: '15%', containLabel: true },
+        xAxis: { type: 'category', data: ['草莓蛋糕', '巧克力蛋糕', '香草冰淇淋', '芝士饼干', '提拉米苏', '奶油泡芙', '芒果慕斯', '抹茶蛋糕'] },
+        yAxis: { type: 'value', name: '销量(件)' },
+        series: [
+            {
+                name: '昨日销量',
+                type: 'bar',
+                data: [65, 58, 45, 42, 38, 35, 32, 28],
+                barWidth: '35%',
+                itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{offset: 0, color: '#94a3b8'}, {offset: 1, color: '#64748b'}]) },
+                label: { show: true, position: 'top' }
+            },
+            {
+                name: '今日销量',
+                type: 'bar',
+                data: [78, 72, 55, 48, 42, 38, 36, 32],
+                barWidth: '35%',
+                itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{offset: 0, color: '#3b82f6'}, {offset: 1, color: '#2563eb'}]) },
+                label: { show: true, position: 'top' }
+            }
+        ]
+    });
+
+    window.addEventListener('resize', function() {
+        salesTrendChart.resize();
+        paymentChart.resize();
+        goodsSalesChart.resize();
+        topGoodsChart.resize();
+    });
+}
+
+function toggleTheme(){var body=document.body;var current=body.getAttribute('data-theme');var next=current==='dark'?'light':'dark';body.setAttribute('data-theme',next);localStorage.setItem('theme',next);var icon=document.getElementById('themeIcon');var label=document.getElementById('themeLabel');if(next==='dark'){icon.className='fas fa-moon';label.textContent='夜间模式'}else{icon.className='fas fa-sun';label.textContent='日间模式'}}
+function switchLang(lang){var url=new URL(window.location.href);url.searchParams.set('lang',lang);window.location.href=url.toString()}
+(function(){var theme=localStorage.getItem('theme')||'light';document.body.setAttribute('data-theme',theme);var icon=document.getElementById('themeIcon');var label=document.getElementById('themeLabel');if(icon&&label){if(theme==='dark'){icon.className='fas fa-moon';label.textContent='夜间模式'}else{icon.className='fas fa-sun';label.textContent='日间模式'}}})();
+
+function openAIChat() {
+    document.getElementById('aiChatModal').classList.add('show');
+    document.getElementById('aiChatOverlay').classList.add('show');
+    document.getElementById('aiChatInput').focus();
+}
+
+function closeAIChat() {
+    document.getElementById('aiChatModal').classList.remove('show');
+    document.getElementById('aiChatOverlay').classList.remove('show');
+}
+
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
+}
+
+function sendMessage() {
+    var input = document.getElementById('aiChatInput');
+    var message = input.value.trim();
+    
+    if (!message) return;
+    
+    var messagesContainer = document.getElementById('aiChatMessages');
+    
+    var userMessage = document.createElement('div');
+    userMessage.className = 'ai-chat-message user';
+    userMessage.textContent = message;
+    messagesContainer.appendChild(userMessage);
+    
+    input.value = '';
+    
+    var typingIndicator = document.createElement('div');
+    typingIndicator.className = 'ai-chat-typing';
+    typingIndicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    messagesContainer.appendChild(typingIndicator);
+    
+    var chatBody = document.getElementById('aiChatBody');
+    chatBody.scrollTop = chatBody.scrollHeight;
+    
+    fetch('/ai/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: message })
+    })
+    .then(response => response.json())
+    .then(data => {
+        messagesContainer.removeChild(typingIndicator);
+        
+        var aiMessage = document.createElement('div');
+        aiMessage.className = 'ai-chat-message ai';
+        aiMessage.innerHTML = `
+            <div class="ai-msg-avatar">
+                <img src="/images/1781227633000.gif" alt="AI" />
+            </div>
+            <div class="ai-msg-content">
+                ${data.reply}
+            </div>
+        `;
+        messagesContainer.appendChild(aiMessage);
+        
+        chatBody.scrollTop = chatBody.scrollHeight;
+    })
+    .catch(error => {
+        messagesContainer.removeChild(typingIndicator);
+        
+        var errorMessage = document.createElement('div');
+        errorMessage.className = 'ai-chat-message ai';
+        errorMessage.innerHTML = `
+            <div class="ai-msg-avatar">
+                <img src="/images/1781227633000.gif" alt="AI" />
+            </div>
+            <div class="ai-msg-content">
+                抱歉，服务暂时不可用，请稍后重试。
+            </div>
+        `;
+        messagesContainer.appendChild(errorMessage);
+        
+        chatBody.scrollTop = chatBody.scrollHeight;
+    });
+}
+</script>
+</body>
+</html>

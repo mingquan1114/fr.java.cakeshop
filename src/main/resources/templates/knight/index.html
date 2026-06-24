@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>骑士端 - 首页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/css/knight.css">
+    <style>
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-sm);
+            padding: var(--spacing-lg) var(--spacing-lg) 0;
+        }
+        
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg) var(--spacing-sm);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-light), var(--primary-color));
+            transform: scaleX(0);
+            transition: transform var(--transition-normal);
+        }
+        
+        .stat-card:hover::before,
+        .stat-card.active::before {
+            transform: scaleX(1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .stat-card.active {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(255, 107, 53, 0.05));
+        }
+        
+        .stat-card .num {
+            font-size: var(--font-4xl);
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        
+        .stat-card .num.c-orange { color: var(--color-orange); }
+        .stat-card .num.c-blue { color: var(--color-blue); }
+        .stat-card .num.c-green { color: var(--color-green); }
+        .stat-card .num.c-pink { color: var(--color-pink); }
+        
+        .stat-card .label {
+            font-size: var(--font-xs);
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+        
+        .tabs {
+            display: flex;
+            padding: var(--spacing-lg);
+            gap: 0;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: var(--spacing-md) 0;
+            font-size: var(--font-base);
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .order-list {
+            padding: var(--spacing-md) var(--spacing-lg) calc(var(--spacing-xl) * 4);
+        }
+        
+        .order-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-md);
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .order-card:hover {
+            border-color: rgba(255, 107, 53, 0.3);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .order-id {
+            font-size: var(--font-sm);
+            color: var(--text-muted);
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+        
+        .order-status {
+            font-size: var(--font-xs);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .order-info {
+            font-size: var(--font-base);
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        .order-info .amount {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .delivery-fee {
+            font-size: var(--font-base);
+            margin-top: var(--spacing-xs);
+        }
+        
+        .delivery-fee .fee-amount {
+            color: var(--color-green);
+            font-weight: 700;
+            font-size: var(--font-md);
+        }
+        
+        .order-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .price-display {
+            font-size: var(--font-lg);
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .address-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏍️ 骑士端</h1>
+        <div class="user-info">
+            <span th:text="${knight.name}">张三</span>
+            <a th:href="@{/knight/logout}">退出</a>
+        </div>
+    </div>
+
+    <div class="stats">
+        <a th:href="@{/knight/index(tab=pending)}" class="stat-card" th:classappend="${currentTab == 'pending' ? 'active' : ''}">
+            <div class="num c-orange" th:text="${pendingCount}">0</div>
+            <div class="label">待接单</div>
+        </a>
+        <a th:href="@{/knight/index(tab=pickup)}" class="stat-card" th:classappend="${currentTab == 'pickup' ? 'active' : ''}">
+            <div class="num c-blue" th:text="${pickupCount}">0</div>
+            <div class="label">待取货</div>
+        </a>
+        <a th:href="@{/knight/index(tab=delivering)}" class="stat-card" th:classappend="${currentTab == 'delivering' ? 'active' : ''}">
+            <div class="num c-green" th:text="${deliveringCount}">0</div>
+            <div class="label">配送中</div>
+        </a>
+        <a th:href="@{/knight/index(tab=completed)}" class="stat-card" th:classappend="${currentTab == 'completed' ? 'active' : ''}">
+            <div class="num c-pink" th:text="${completedCount}">0</div>
+            <div class="label">已完成</div>
+        </a>
+    </div>
+
+    <div class="tabs">
+        <a th:href="@{/knight/index(tab=pending)}" class="tab" th:classappend="${currentTab == 'pending' ? 'active' : ''}">待接单</a>
+        <a th:href="@{/knight/index(tab=pickup)}" class="tab" th:classappend="${currentTab == 'pickup' ? 'active' : ''}">待取货</a>
+        <a th:href="@{/knight/index(tab=delivering)}" class="tab" th:classappend="${currentTab == 'delivering' ? 'active' : ''}">配送中</a>
+        <a th:href="@{/knight/index(tab=completed)}" class="tab" th:classappend="${currentTab == 'completed' ? 'active' : ''}">已完成</a>
+    </div>
+
+    <div class="order-list">
+        <th:block th:if="${orderList != null && !orderList.isEmpty()}">
+            <div th:each="order : ${orderList}" class="order-card">
+                <div class="order-header">
+                    <span class="order-id">订单 #<span th:text="${order.id}"></span></span>
+                    <span th:if="${order.status == 2}" class="order-status status-pending">待接单</span>
+                    <span th:if="${order.status == 3}" class="order-status status-pickup">待取货</span>
+                    <span th:if="${order.status == 4}" class="order-status status-delivering">配送中</span>
+                    <span th:if="${order.status == 5}" class="order-status status-completed">已完成</span>
+                </div>
+                <div class="order-info">
+                    <div>商品数量: <span class="amount" th:text="${order.amount}"></span> 件</div>
+                    <div class="address-text" th:text="${order.address}"></div>
+                    <div><i class="fas fa-user"></i> <span th:text="${order.name}"></span></div>
+                    <div><i class="fas fa-phone"></i> <span th:text="${order.phone}"></span></div>
+                    <div><i class="fas fa-clock"></i> <span th:text="${order.datetime}"></span></div>
+                    <div class="price-display" style="margin-top: var(--spacing-sm);">订单金额: ¥<span th:text="${order.total}"></span></div>
+                    <div class="delivery-fee">配送费: <span class="fee-amount">¥<span th:text="${#numbers.formatDecimal(order.deliveryFee, 0, 'COMMA', 2, 'POINT')}"></span></span></div>
+                </div>
+                <div class="order-actions">
+                    <a th:href="@{/knight/orderDetail(id=${order.id})}" class="btn btn-outline"><i class="fas fa-eye"></i> 查看详情</a>
+                    <a th:if="${order.status == 2}" th:href="@{/knight/acceptOrder(id=${order.id})}" class="btn btn-primary"><i class="fas fa-check-circle"></i> 确认接单</a>
+                    <a th:if="${order.status == 3}" th:href="@{/knight/pickupOrder(id=${order.id})}" class="btn btn-primary"><i class="fas fa-store"></i> 确认取货</a>
+                    <a th:if="${order.status == 4}" th:href="@{/knight/deliverOrder(id=${order.id})}" class="btn btn-primary"><i class="fas fa-home"></i> 确认送达</a>
+                </div>
+            </div>
+        </th:block>
+        <th:block th:else>
+            <div class="empty-state">
+                <i class="far fa-clipboard"></i>
+                <p>暂无订单</p>
+            </div>
+        </th:block>
+    </div>
+
+    <div class="bottom-nav">
+        <a th:href="@{/knight/index}" class="nav-item active">
+            <i class="fas fa-home"></i><span>首页</span>
+        </a>
+        <a th:href="@{/knight/income}" class="nav-item">
+            <i class="fas fa-coins"></i><span>收入</span>
+        </a>
+        <a th:href="@{/knight/message}" class="nav-item">
+            <i class="fas fa-bell"></i><span>消息</span>
+        </a>
+        <a th:href="@{/knight/profile}" class="nav-item">
+            <i class="fas fa-user"></i><span>我的</span>
+        </a>
+    </div>
+</body>
+</html>

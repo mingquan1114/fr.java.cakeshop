@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>新增商品 - 蛋糕系统</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;min-height:100vh}
+.admin-container{display:flex;min-height:100vh}
+.sidebar{width:230px;background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);color:#fff;position:fixed;left:0;top:0;bottom:0;overflow-y:auto;z-index:100;box-shadow:2px 0 20px rgba(0,0,0,.1)}
+.sidebar-header{padding:24px 20px;background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);text-align:center;font-size:18px;font-weight:700;letter-spacing:1px}
+.sidebar .menu-item{list-style:none;padding:0;margin:8px 0}
+.sidebar .menu-item>li{position:relative}
+.sidebar .menu-item>li>a{display:flex;align-items:center;padding:13px 20px;color:#94a3b8;text-decoration:none;transition:all .25s ease;font-size:13.5px;font-weight:500;gap:10px}
+.sidebar .menu-item>li>a i{width:18px;text-align:center;font-size:14px}
+.sidebar .menu-item>li>a:hover{background:rgba(255,255,255,.08);color:#e2e8f0;padding-left:24px}
+.sidebar .menu-item>li.active>a{background:rgba(59,130,246,.25);color:#fff;border-left:3px solid #3b82f6}
+.sidebar .menu-item>li>a::after{content:'\f107';font-family:'Font Awesome 5 Free';font-weight:900;margin-left:auto;font-size:11px;transition:transform .3s ease}
+.sidebar .menu-item>li:not(:has(.submenu))>a::after{display:none}
+.sidebar .menu-item .submenu{display:none;background:rgba(0,0,0,.15);list-style:none}
+.sidebar .menu-item>li.open .submenu{display:block}
+.sidebar .menu-item>li.open>a::after{transform:rotate(180deg)}
+.submenu li a{display:block;padding:11px 20px 11px 48px;color:#94a3b8;text-decoration:none;font-size:13px;transition:all .2s ease}
+.submenu li a:hover{background:rgba(255,255,255,.08);color:#fff;padding-left:52px}
+.submenu li.active-sub a{color:#3b82f6;font-weight:500}
+.menu-sep{padding:8px 20px;font-size:11px;color:#64748b;letter-spacing:.5px;text-transform:uppercase;margin-top:16px}
+.main-content{flex:1;margin-left:230px;min-height:100vh}
+.top-header{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:#fff;border-bottom:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.top-header h1{font-size:18px;color:#1e293b;font-weight:600;display:flex;align-items:center;gap:10px}
+.top-header h1 i{color:#3b82f6}
+.header-right{display:flex;align-items:center;gap:16px}
+.admin-badge{display:flex;align-items:center;gap:8px;padding:8px 14px;background:#e0f2fe;color:#0369a1;border-radius:20px;font-size:13px}
+.admin-badge i{font-size:14px}
+.logout-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:#dc2626;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;transition:all .2s ease}
+.logout-btn:hover{background:#b91c1c}
+.content-body{padding:24px}
+.panel{background:#fff;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden}
+.panel-header{padding:18px 24px;border-bottom:1px solid #e2e8f0;background:#fafbfc}
+.panel-title{font-size:16px;color:#1e293b;font-weight:600;margin:0}
+.form-wrap{padding:24px}
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:1200px){.form-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.form-grid{grid-template-columns:1fr}}
+.form-row-full{grid-column:1/-1}
+.form-group{display:flex;flex-direction:column;gap:8px}
+.form-group label{font-size:13px;color:#374151;font-weight:500}
+.form-group input,.form-group select,.form-group textarea{padding:10px 14px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;color:#1e293b;transition:all .2s ease;background:#fff}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.form-group textarea{resize:vertical;min-height:100px}
+.form-group .image-upload-container{display:flex;flex-direction:column;gap:10px}
+.form-group .image-preview{width:120px;height:120px;border:2px dashed #d1d5db;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#f9fafb}
+.form-group .image-preview img{width:100%;height:100%;object-fit:cover}
+.form-group .image-preview.empty{color:#9ca3af;font-size:12px}
+.form-group .image-preview.empty i{font-size:24px;margin-bottom:4px}
+.form-group .upload-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#3b82f6;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;transition:all .2s ease;width:fit-content}
+.form-group .upload-btn:hover{background:#2563eb}
+.form-group .upload-btn input[type="file"]{display:none}
+.form-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e2e8f0}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s ease}
+.btn-primary{background:#3b82f6;color:#fff}
+.btn-primary:hover{background:#2563eb}
+.btn-light{background:#f3f4f6;color:#374151;border:1px solid #d1d5db}
+.btn-light:hover{background:#e5e7eb}
+.toast-overlay{position:fixed;top:20px;right:20px;z-index:1000;animation:slideIn .3s ease}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-msg{display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:8px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.toast-msg.success{background:#dcfce7;color:#16a34a}
+.toast-msg.error{background:#fee2e2;color:#dc2626}
+.loading-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;border-radius:8px}
+.loading-overlay i{font-size:20px;color:#3b82f6;animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+:root{--bg:#f0f2f5;--text:#1e293b;-text-secondary:#64748b}
+[data-theme="dark"]{--bg:#0f172a;--text:#e2e8f0;}
+body[data-theme="dark"]{background:var(--bg);color:var(--text)}
+.theme-toggle{background:#f1f5f9;color:#475569;border:none;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:6px}
+.theme-toggle:hover{opacity:.8}
+</style>
+</head>
+<body>
+<div class="admin-container">
+<aside class="sidebar">
+<div class="sidebar-header"><i class="fas fa-birthday-cake"></i><span th:text="#{admin.sidebar.title}">蛋糕管理系统</span></div>
+<div class="menu-sep" th:text="#{admin.sidebar.mainMenu}">主菜单</div>
+<ul class="menu-item">
+<li th:class="${currentPage == 'index' ? 'active' : ''}"><a href="/admin/index"><i class="fas fa-tachometer-alt"></i><span th:text="#{admin.sidebar.dashboard}">控制台</span></a></li>
+<li th:class="${currentPage == 'userList' ? 'active open' : ''}"><a href="#"><i class="fas fa-users"></i><span th:text="#{admin.sidebar.userManagement}">用户管理</span></a>
+<ul class="submenu">
+<li><a href="/admin/userList" th:class="${currentPage == 'userList' ? 'active-sub' : ''}"><span th:text="#{admin.sidebar.userList}">用户列表</span></a></li>
+</ul></li>
+<li th:class="${currentPage == 'goodsList' || currentPage == 'addGoods' ? 'active open' : ''}"><a href="#"><i class="fas fa-boxes"></i><span th:text="#{admin.sidebar.goodsManagement}">商品管理</span></a>
+<ul class="submenu">
+<li><a href="/admin/goodsList" th:class="${currentPage == 'goodsList' ? 'active-sub' : ''}"><span th:text="#{admin.sidebar.goodsList}">商品列表</span></a></li>
+<li><a href="/admin/addGoods" th:class="${currentPage == 'addGoods' ? 'active-sub' : ''}"><span th:text="#{admin.sidebar.addGoods}">新增商品</span></a></li>
+</ul></li>
+<li th:class="${currentPage == 'typeList' ? 'active open' : ''}"><a href="#"><i class="fas fa-tags"></i><span th:text="#{admin.sidebar.categoryManagement}">分类管理</span></a>
+<ul class="submenu">
+<li><a href="/admin/typeList" th:class="${currentPage == 'typeList' ? 'active-sub' : ''}"><span th:text="#{admin.sidebar.categoryList}">分类列表</span></a></li>
+</ul></li>
+<li th:class="${currentPage == 'orderList' ? 'active open' : ''}"><a href="#"><i class="fas fa-shopping-cart"></i><span th:text="#{admin.sidebar.orderManagement}">订单管理</span></a>
+<ul class="submenu">
+<li><a href="/admin/orderList" th:class="${currentPage == 'orderList' ? 'active-sub' : ''}"><span th:text="#{admin.sidebar.orderList}">所有订单</span></a></li>
+</ul></li>
+<li th:class="${currentPage == 'adminSetting' || currentPage == 'logList' ? 'active open' : ''}"><a href="/admin/adminSetting"><i class="fas fa-cogs"></i><span th:text="#{admin.sidebar.systemManagement}">系统管理</span></a><ul class="submenu"><li><a href="/admin/adminSetting" th:class="${currentPage == 'adminSetting' ? 'active-sub' : ''}"><span th:text="#{admin.sidebar.adminSettings}">管理员设置</span></a></li><li><a href="/admin/logList" th:class="${currentPage == 'logList' ? 'active-sub' : ''}"><span th:text="#{admin.sidebar.logManagement}">日志管理</span></a></li></ul></li>
+</ul>
+</aside>
+<main class="main-content">
+<header class="top-header">
+<h1><i class="fas fa-plus-circle"></i><span th:text="#{admin.goods.add.title}">新增商品</span></h1>
+<div class="header-right">
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"><i class="fas fa-sun" id="themeIcon"></i><span id="themeLabel" th:text="#{admin.theme.light}">日间模式</span></button>
+<div class="lang-switch">
+<select id="langSelect" onchange="switchLang(this.value)">
+<option value="zh" th:text="#{admin.lang.zh}" th:selected="${#locale.language == 'zh'}">中文</option>
+            <option value="en" th:text="#{admin.lang.en}" th:selected="${#locale.language == 'en'}">English</option>
+            <option value="ja" th:text="#{admin.lang.ja}" th:selected="${#locale.language == 'ja'}">日本語</option>
+</select>
+</div>
+<div class="admin-badge"><i class="fas fa-user-shield"></i><span th:text="#{admin.welcome}">欢迎</span>，<span th:text="${adminName}"></span></div>
+<button class="logout-btn" onclick="location.href='/user/loginout'"><i class="fas fa-sign-out-alt"></i><span th:text="#{admin.logout}">退出</span></button>
+</div>
+</header>
+<div class="content-body">
+<div th:if="${msg != null}" class="toast-overlay">
+<div class="toast-msg" th:classappend="${msg.contains('成功') || msg.contains('已') ? 'success' : 'error'}" id="toastMsg">
+<i th:class="${msg.contains('成功') || msg.contains('已') ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'}"></i>
+<span th:text="${msg}"></span>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title" th:text="#{admin.goods.info}">商品信息</h2>
+</div>
+<form class="form-wrap" th:action="@{/admin/saveGoods}" method="post" enctype="multipart/form-data" onsubmit="return vld()">
+<div class="form-grid">
+<div class="form-group"><label th:text="#{admin.goods.name}">商品名称</label><span>*</span><input type="text" name="name" required th:placeholder="#{admin.goods.name.placeholder}"></div>
+<div class="form-group"><label th:text="#{admin.goods.price}">价格</label><span>*</span><input type="text" name="price" required placeholder="¥0.00"></div>
+<div class="form-group"><label th:text="#{admin.goods.stock}">库存</label><input type="number" name="stock" value="100" required></div>
+<div class="form-group"><label th:text="#{admin.goods.type}">分类</label><select name="type_id"><option value="" th:text="#{admin.goods.type.select}">请选择分类</option><option th:each="t : ${typeList}" th:value="${t.id}" th:text="${t.name}"></option></select></div>
+
+<div class="form-group">
+<label th:text="#{admin.goods.cover}">封面图片</label>
+<input type="hidden" name="cover" id="coverInput">
+<div class="image-upload-container">
+<div class="image-preview empty" id="coverPreview">
+<div class="text-center">
+<i class="fas fa-image"></i>
+<div th:text="#{admin.goods.cover.upload}">上传封面</div>
+</div>
+</div>
+<label class="upload-btn">
+<i class="fas fa-upload"></i><span th:text="#{admin.goods.select.image}">选择图片</span>
+<input type="file" name="coverFile" accept="image/*" onchange="uploadImage(this, 'cover')">
+</label>
+</div>
+</div>
+
+<div class="form-group">
+<label th:text="#{admin.goods.image1}">详情图1</label>
+<input type="hidden" name="image1" id="image1Input">
+<div class="image-upload-container">
+<div class="image-preview empty" id="image1Preview">
+<div class="text-center">
+<i class="fas fa-image"></i>
+<div th:text="#{admin.goods.image1.upload}">上传图片1</div>
+</div>
+</div>
+<label class="upload-btn">
+<i class="fas fa-upload"></i><span th:text="#{admin.goods.select.image}">选择图片</span>
+<input type="file" name="image1File" accept="image/*" onchange="uploadImage(this, 'image1')">
+</label>
+</div>
+</div>
+
+<div class="form-group">
+<label th:text="#{admin.goods.image2}">详情图2</label>
+<input type="hidden" name="image2" id="image2Input">
+<div class="image-upload-container">
+<div class="image-preview empty" id="image2Preview">
+<div class="text-center">
+<i class="fas fa-image"></i>
+<div th:text="#{admin.goods.image2.upload}">上传图片2</div>
+</div>
+</div>
+<label class="upload-btn">
+<i class="fas fa-upload"></i><span th:text="#{admin.goods.select.image}">选择图片</span>
+<input type="file" name="image2File" accept="image/*" onchange="uploadImage(this, 'image2')">
+</label>
+</div>
+</div>
+
+<div class="form-row-full form-group"><label th:text="#{admin.goods.intro}">商品介绍</label><textarea name="intro" th:placeholder="#{admin.goods.intro.placeholder}"></textarea></div>
+</div>
+<div class="form-actions">
+<button type="button" class="btn btn-light" onclick="location.href='/admin/goodsList'"><i class="fas fa-arrow-left"></i><span th:text="#{common.cancel}">取消</span></button>
+<button type="submit" class="btn btn-primary"><i class="fas fa-save"></i><span th:text="#{admin.goods.save}">保存商品</span></button>
+</div>
+</form>
+</div>
+</div>
+</main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+<script>
+(function(){
+var m=document.getElementById('toastMsg');
+if(m)setTimeout(function(){m.parentElement.remove()},3000);
+document.querySelectorAll('.sidebar .menu-item>li>a').forEach(function(a){
+a.addEventListener('click',function(e){
+var li=a.parentElement,sub=li.querySelector('.submenu');
+if(sub){e.preventDefault();li.classList.toggle('open')}})})
+})();
+
+function vld(){
+var n=document.forms[0].name.value.trim();
+var p=document.forms[0].price.value.trim();
+if(!n){alert('请输入商品名称');return false}
+if(!p||isNaN(parseFloat(p))){alert('请输入有效的价格');return false}
+return true
+}
+
+function uploadImage(input, fieldName) {
+var file = input.files[0];
+if (!file) return;
+
+var validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+if (!validTypes.includes(file.type)) {
+alert('请选择有效的图片文件（JPG、PNG、GIF）');
+return;
+}
+
+var maxSize = 5 * 1024 * 1024;
+if (file.size > maxSize) {
+alert('图片大小不能超过5MB');
+return;
+}
+
+var preview = document.getElementById(fieldName + 'Preview');
+var inputField = document.getElementById(fieldName + 'Input');
+
+preview.innerHTML = '<div class="loading-overlay"><i class="fas fa-spinner"></i></div>';
+
+var formData = new FormData();
+formData.append('file', file);
+
+fetch('/admin/uploadImage', {
+method: 'POST',
+body: formData
+})
+.then(response => response.json())
+.then(data => {
+if (data.success) {
+inputField.value = data.path;
+preview.innerHTML = '<img src="' + data.path + '" alt="' + fieldName + '">';
+preview.classList.remove('empty');
+} else {
+alert(data.message || '上传失败');
+preview.innerHTML = '<div class="text-center"><i class="fas fa-image"></i><div>上传失败</div></div>';
+preview.classList.add('empty');
+}
+})
+.catch(error => {
+console.error('上传错误:', error);
+alert('上传发生错误');
+preview.innerHTML = '<div class="text-center"><i class="fas fa-image"></i><div>上传失败</div></div>';
+preview.classList.add('empty');
+});
+}
+
+function toggleTheme(){var body=document.body;var current=body.getAttribute('data-theme');var next=current==='dark'?'light':'dark';body.setAttribute('data-theme',next);localStorage.setItem('theme',next);var icon=document.getElementById('themeIcon');var label=document.getElementById('themeLabel');if(next==='dark'){icon.className='fas fa-moon';label.textContent='夜间模式'}else{icon.className='fas fa-sun';label.textContent='日间模式'}}
+function switchLang(lang){var url=new URL(window.location.href);url.searchParams.set('lang',lang);window.location.href=url.toString()}
+(function(){var theme=localStorage.getItem('theme')||'light';document.body.setAttribute('data-theme',theme);var icon=document.getElementById('themeIcon');var label=document.getElementById('themeLabel');if(icon&&label){if(theme==='dark'){icon.className='fas fa-moon';label.textContent='夜间模式'}else{icon.className='fas fa-sun';label.textContent='日间模式'}}})();
+</script>
+</body>
+</html>

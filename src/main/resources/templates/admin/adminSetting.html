@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"><title th:text="#{setting.title}">管理员设置</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link id="theme-style" rel="stylesheet" href="">
+<style>
+:root{--bg:#f0f2f5;--card-bg:#fff;--card-border:#e2e8f0;--text:#1e293b;--text-secondary:#64748b;--text-light:#94a3b8;--sidebar-bg-start:#1e293b;--sidebar-bg-end:#0f172a;--header-bg:#fff;--header-border:#e2e8f0;--hover-bg:#f8fafc;--th-bg:#f8fafc;--th-text:#475569;--input-bg:#fff;--input-border:#e2e8f0;--badge-bg:#f1f5f9;--badge-text:#475569;--pagination-bg:#fff;--blue:#3b82f6;--blue-hover:#2563eb}
+[data-theme="dark"]{--bg:#0f172a;--card-bg:#1e293b;--card-border:#334155;--text:#e2e8f0;--text-secondary:#94a3b8;--text-light:#64748b;--sidebar-bg-start:#0c1222;--sidebar-bg-end:#060b14;--header-bg:#1e293b;--header-border:#334155;--hover-bg:#1e293b;--th-bg:#1e293b;--th-text:#94a3b8;--input-bg:#334155;--input-border:#475569;--badge-bg:#334155;--badge-text:#cbd5e1;--pagination-bg:#334155;--blue:#60a5fa;--blue-hover:#3b82f6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);transition:background .3s,color .3s}
+.admin-container{display:flex;min-height:100vh}
+.sidebar{width:230px;background:linear-gradient(180deg,var(--sidebar-bg-start) 0%,var(--sidebar-bg-end) 100%);color:#fff;position:fixed;left:0;top:0;bottom:0;overflow-y:auto;z-index:100;box-shadow:2px 0 20px rgba(0,0,0,.1)}
+.sidebar-header{padding:24px 20px;background:linear-gradient(135deg,var(--blue) 0%,var(--blue-hover) 100%);text-align:center;font-size:18px;font-weight:700;letter-spacing:1px}
+.sidebar .menu-sep{padding:8px 20px 4px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.sidebar .menu-item{list-style:none;padding:0;margin:8px 0}
+.sidebar .menu-item>li>a{display:flex;align-items:center;padding:13px 20px;color:#94a3b8;text-decoration:none;transition:all .25s ease;font-size:13.5px;font-weight:500;gap:10px}
+.sidebar .menu-item>li>a i{width:18px;text-align:center;font-size:14px}
+.sidebar .menu-item>li>a:hover{background:rgba(255,255,255,.08);color:#e2e8f0;padding-left:24px}
+.sidebar .menu-item>li.active>a{background:rgba(59,130,246,.25);color:#fff;border-left:3px solid var(--blue)}
+.submenu{display:none;background:rgba(0,0,0,.15);list-style:none}
+.sidebar .menu-item>li.open .submenu{display:block}
+.submenu li a{display:block;padding:11px 20px 11px 48px;color:#94a3b8;text-decoration:none;font-size:13px;transition:all .25s ease}
+.submenu li a:hover{background:rgba(255,255,255,.06);color:#e2e8f0}
+.submenu li a.active-sub{background:rgba(59,130,246,.2);color:#60a5fa;font-weight:600}
+.main-content{margin-left:230px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.top-header{background:var(--header-bg);padding:14px 30px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--header-border);transition:background .3s}
+.top-header h1{font-size:18px;font-weight:700;color:var(--text);margin:0}
+.top-header h1 i{margin-right:8px;color:var(--blue)}
+.header-right{display:flex;align-items:center;gap:16px}
+.admin-badge{display:flex;align-items:center;gap:8px;background:var(--badge-bg);padding:6px 14px;border-radius:20px;font-size:13px;color:var(--badge-text);transition:background .3s}
+.admin-badge i{color:var(--blue)}.admin-badge span{font-weight:600;color:var(--text)}
+.theme-toggle,.lang-switch{background:var(--badge-bg);color:var(--text);border:none;border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:6px}
+.theme-toggle:hover,.lang-switch:hover{opacity:.85}
+.lang-switch select{background:transparent;border:none;color:var(--text);font-size:13px;font-weight:600;outline:none;cursor:pointer}
+.logout-btn{padding:7px 18px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:6px}
+.logout-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(239,68,68,.3)}
+.content-body{padding:24px 30px;flex:1}
+.toast-overlay{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;pointer-events:none}
+.toast-msg{background:#1e293b;color:#fff;padding:16px 32px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 10px 40px rgba(0,0,0,.25);animation:fadeInOut 3s ease forwards;display:flex;align-items:center;gap:10px}
+.toast-msg.success{border-left:4px solid #22c55e}.toast-msg.error{border-left:4px solid #ef4444}@keyframes fadeInOut{0%{opacity:0;transform:translateY(20px)}15%{opacity:1;transform:translateY(0)}85%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-20px)}}
+.panel{background:var(--card-bg);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden;border:1px solid var(--card-border);transition:background .3s}
+.panel-header{padding:18px 24px;border-bottom:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.panel-title{font-size:15px;font-weight:700;color:var(--text);margin:0}
+.setting-form{padding:24px;max-width:500px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px}
+.form-group input{width:100%;padding:11px 14px;border:1px solid var(--input-border);border-radius:8px;font-size:14px;outline:none;transition:border-color .25s;background:var(--input-bg);color:var(--text)}
+.form-group input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.form-group input::placeholder{color:var(--text-light)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:10px 24px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .25s}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-hover)}
+.btn-slate{background:var(--text-secondary);color:#fff}.btn-slate:hover{opacity:.85}
+#langSelect{padding:4px 8px;border-radius:4px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:13px}
+</style>
+</head>
+<body data-theme="light">
+
+<div class="admin-container">
+<aside class="sidebar">
+<div class="sidebar-header"><i class="fas fa-birthday-cake"></i><span th:text="#{admin.sidebar.title}">蛋糕管理系统</span></div>
+<div class="menu-sep" th:text="#{admin.sidebar.mainMenu}">主菜单</div>
+<ul class="menu-item">
+<li th:class="${currentPage == 'index' ? 'active' : ''}"><a href="/admin/index"><i class="fas fa-tachometer-alt"></i><span th:text="#{admin.sidebar.dashboard}">控制台</span></a></li>
+<li th:class="${currentPage == 'userList' ? 'active open' : ''}"><a href="/admin/userList"><i class="fas fa-users"></i><span th:text="#{admin.sidebar.userManagement}">用户管理</span></a><ul class="submenu"><li><a href="/admin/userList" th:class="${currentPage == 'userList' ? 'active-sub' : ''}" th:text="#{admin.sidebar.userList}">用户列表</a></li></ul></li>
+<li th:class="${currentPage == 'goodsList' || currentPage == 'addGoods' || currentPage == 'goodsDetail' ? 'active open' : ''}"><a href="/admin/goodsList"><i class="fas fa-boxes"></i><span th:text="#{admin.sidebar.goodsManagement}">商品管理</span></a><ul class="submenu"><li><a href="/admin/goodsList" th:class="${currentPage == 'goodsList' || currentPage == 'goodsDetail' ? 'active-sub' : ''}" th:text="#{admin.sidebar.goodsList}">商品列表</a></li><li><a href="/admin/addGoods" th:class="${currentPage == 'addGoods' ? 'active-sub' : ''}" th:text="#{admin.sidebar.addGoods}">新增商品</a></li></ul></li>
+<li th:class="${currentPage == 'typeList' ? 'active open' : ''}"><a href="/admin/typeList"><i class="fas fa-tags"></i><span th:text="#{admin.sidebar.categoryManagement}">分类管理</span></a><ul class="submenu"><li><a href="/admin/typeList" th:class="${currentPage == 'typeList' ? 'active-sub' : ''}" th:text="#{admin.sidebar.categoryList}">分类列表</a></li></ul></li>
+<li th:class="${currentPage == 'orderList' ? 'active open' : ''}"><a href="/admin/orderList"><i class="fas fa-shopping-cart"></i><span th:text="#{admin.sidebar.orderManagement}">订单管理</span></a><ul class="submenu"><li><a href="/admin/orderList" th:class="${currentPage == 'orderList' ? 'active-sub' : ''}" th:text="#{admin.sidebar.allOrders}">所有订单</a></li></ul></li>
+<li th:class="${currentPage == 'adminSetting' || currentPage == 'logList' ? 'active open' : ''}"><a href="/admin/adminSetting"><i class="fas fa-cogs"></i><span th:text="#{admin.sidebar.systemManagement}">系统管理</span></a><ul class="submenu"><li><a href="/admin/adminSetting" th:class="${currentPage == 'adminSetting' ? 'active-sub' : ''}" th:text="#{admin.sidebar.adminSettings}">管理员设置</a></li><li><a href="/admin/logList" th:class="${currentPage == 'logList' ? 'active-sub' : ''}" th:text="#{admin.sidebar.logManagement}">日志管理</a></li></ul></li>
+</ul>
+</aside>
+
+<main class="main-content">
+<header class="top-header">
+<h1><i class="fas fa-cogs"></i><span th:text="#{admin.setting.title}">管理员设置</span></h1>
+<div class="header-right">
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"><i class="fas fa-sun" id="themeIcon"></i><span id="themeLabel" th:text="#{admin.theme.light}">日间模式</span></button>
+<div class="lang-switch">
+<select id="langSelect" onchange="switchLang(this.value)">
+<option value="zh" th:text="#{admin.lang.zh}" th:selected="${#locale.language == 'zh'}">中文</option>
+            <option value="en" th:text="#{admin.lang.en}" th:selected="${#locale.language == 'en'}">English</option>
+            <option value="ja" th:text="#{admin.lang.ja}" th:selected="${#locale.language == 'ja'}">日本語</option>
+</select>
+</div>
+<div class="admin-badge"><i class="fas fa-user-shield"></i><span th:text="#{admin.welcome}">欢迎</span>，<span th:text="${adminName}"></span></div>
+<button class="logout-btn" onclick="location.href='/user/loginout'"><i class="fas fa-sign-out-alt"></i><span th:text="#{admin.logout}">退出</span></button>
+</div>
+</header>
+
+<div class="content-body">
+<div th:if="${msg != null}" class="toast-overlay">
+<div class="toast-msg" th:classappend="${#strings.contains(msg, '成功') ? 'success' : 'error'}" id="toastMsg">
+<span th:text="${msg}"></span>
+</div>
+</div>
+<div th:if="${errorMsg != null}" class="toast-overlay">
+<div class="toast-msg error" id="toastErrorMsg">
+<span th:text="${errorMsg}"></span>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title" th:text="#{admin.setting.change.pwd}">修改密码</h2>
+</div>
+<form class="setting-form" th:action="@{/admin/changePassword}" method="post">
+<div class="form-group">
+<label th:text="#{admin.setting.old.pwd}">原密码</label>
+<input type="password" name="oldPassword" th:placeholder="#{admin.setting.old.pwd.placeholder}" required>
+</div>
+<div class="form-group">
+<label th:text="#{admin.setting.new.pwd}">新密码</label>
+<input type="password" name="newPassword" th:placeholder="#{admin.setting.new.pwd.placeholder}" required minlength="6">
+</div>
+<div class="form-group">
+<label th:text="#{admin.setting.confirm.pwd}">确认新密码</label>
+<input type="password" name="confirmPassword" th:placeholder="#{admin.setting.confirm.pwd.placeholder}" required minlength="6">
+</div>
+<button type="submit" class="btn btn-blue"><i class="fas fa-check"></i><span th:text="#{common.submit}">提交</span></button>
+<a class="btn btn-slate" th:href="@{/admin/index}"><span th:text="#{common.back}">返回</span></a>
+</form>
+</div>
+</div>
+</main></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var t = document.getElementById('toastMsg');
+    if(t) setTimeout(function(){t.parentElement.remove()}, 3000);
+    var e = document.getElementById('toastErrorMsg');
+    if(e) setTimeout(function(){e.parentElement.remove()}, 3000);
+    applyTheme();
+});
+function toggleTheme() {
+    var body = document.body;
+    var current = body.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    body.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    applyTheme();
+}
+function applyTheme() {
+    var theme = localStorage.getItem('theme') || 'light';
+    document.body.setAttribute('data-theme', theme);
+    var icon = document.getElementById('themeIcon');
+    var label = document.getElementById('themeLabel');
+    if (icon && label) {
+        if (theme === 'dark') { icon.className = 'fas fa-moon'; label.textContent = '\u591c\u95f4\u6a21\u5f0f'; }
+        else { icon.className = 'fas fa-sun'; label.textContent = '\u65e5\u95f4\u6a21\u5f0f'; }
+    }
+}
+function switchLang(lang) {
+    var url = new URL(window.location.href);
+    url.searchParams.set('lang', lang);
+    window.location.href = url.toString();
+}
+</script>
+</body>
+</html>

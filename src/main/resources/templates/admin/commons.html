@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!--导入index-bottom.html以及main.css-->
+
+<nav class="navbar navbar-inverse" role="navigation" th:fragment="topbar">
+    <div class="container-fluid" style="font-size:1.6em; padding-top:10px; padding-left:70px; ">
+        <!-- 导航头部 -->
+        <div class="navbar-header">
+            <!-- 移动设备上的导航切换按钮 -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-example">
+                <span class="sr-only">切换导航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- 品牌名称或logo -->
+            <a class="navbar-brand" th:href="@{/login.html}">蛋糕系统</a>
+        </div>
+        <!-- 导航项目 -->
+        <div class="collapse navbar-collapse navbar-collapse-example" >
+            <!-- 一般导航项目 -->
+            <ul class="nav navbar-nav">
+                <li th:classappend="${active==1?'active':''}"><a th:href="@{/goods/goodList}">首页</a></li>
+
+                <!-- 导航中的下拉菜单 要映入jquery.js以及zui.js才能生效-->
+                <li class="dropdown" th:if="${active == 1}">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" >商品分类 <b class="caret"></b></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <!-- 也是查询的一部分  只是条件不一样 -->
+                        <li th:each="type:${typelist}">
+                            <a th:href="@{/goods/goodList(typeid=${type.getId()})}">[[${type.getName()}]]</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li th:classappend="${active==10?'active':''}"> <a TH:href="@{/goods/topSell}">热销</a></li>
+                <li><a href="#">新品</a></li>
+
+                <li><a th:href="@{/register.html}">注册</a></li>
+                <li ><a th:href="@{/user/loginout}">退出登录</a></li>   <!-- 此按钮变成退出登录 -->
+                <li ><a th:href="@{/order/orderList}">我的订单</a></li>
+            </ul>
+
+            <!--右侧购物导航条里  图标里  标签-->
+            <ul class="nav navbar-nav navbar-right" style="padding-right:60px;">
+                <li><a th:href="@{/cart/cartList}"><i class="icon icon-shopping-cart icon-2x"></i><span class="label label-badge label-success" style="margin-bottom:6px;" th:text="${count}"></span></a></li>
+            </ul>
+
+            <!--            <c:if test="${active==1 }">-->
+            <!--右侧搜索框表单 导航条里-->
+            <form class="navbar-form navbar-right form-search" role="search">
+                <!-- 搜索框 -->
+                <div class="input-group">
+                    <div class="input-control search-box search-box-circle has-icon-left has-icon-right search-example" id="searchboxExample">
+                        <input id="name" name = "name" type="search" class="form-control search-input" placeholder="搜索">
+                        <label for="name" class="input-control-icon-left search-icon" style="margin-top:-3px;"><i class="icon icon-search"></i></label>
+                        <!-- 按钮在div里 -->
+                        <span class="input-group-btn">
+                         <button class="btn btn-primary" type="button" onclick="queryGood()">搜索</button>
+                    </span>
+                    </div>
+                </div>
+            </form>
+            <!--            </c:if>-->
+        </div><!-- END .navbar-collapse -->
+    </div>
+</nav>
+
+
+<div class="panel-footer foot" th:fragment="footbar">
+    <div id="friend">
+        <h1 class="friend_t"> <img th:src="@{/images/friend_ico.gif}"/> </h1>
+        <div class="friend_list">
+            <ul>
+                <li> <a href="#">百度外卖</a> </li>
+                <li> <a href="#">美团外卖</a> </li>
+                <li> <a href="#">饿了么</a> </li>
+                <li> <a href="#">百度</a> </li>
+                <li> <a href="#">谷歌</a> </li>
+                <li> <a href="#">新浪</a> </li>
+                <li> <a href="#">网易</a> </li>
+                <li> <a href="#">搜狐</a> </li>
+                <li> <a href="#">人人</a> </li>
+                <li> <a href="#">星巴克专星送 (星巴克企业管理(中国)有限公司)</a> </li>
+                <li> <a href="#">海底捞外送 (四川海底捞餐饮股份有限公司)</a> </li>
+                <li> <a href="#">KFC宅急送 (百胜(中国)投资有限公司)</a> </li>
+                <li> <a href="#">到家美食会 (北京到家时代餐饮管理有限公司)</a> </li>
+                <li> <a href="#">麦乐送 (金拱门(中国)有限公司)</a> </li>
+                <li> <a href="#">口碑 (阿里巴巴集团控股有限公司)</a> </li>
+            </ul>
+        </div>
+    </div>
+    <div id="footer">
+        <p class=""> 24小时客户服务热线：010-68988888 &#160;&#160;&#160;&#160; <a href="#">常见问题解答</a> &#160;&#160;&#160;&#160; 投诉热线：010-627488888 <br />
+            文明办网文明上网举报电话：010-627488888 &#160;&#160;&#160;&#160; 举报邮箱： <a href="#">jubao@jb-aptech.com.cn</a> </p>
+        <p class="copyright"> Copyright &copy; 1999-2026 News China gov, All Right Reserver <br />
+            网龙网络有限公司 版权所有 </p>
+    </div>
+</div>

@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>蛋糕系统 - 首页</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+    <link type="text/css" rel="stylesheet" th:href="@{/css/main.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/zui.min.css}">
+    <script type="text/javascript" th:src="@{/js/jquery-3.0.0.js}"></script>
+    <script type="text/javascript" th:src="@{/js/zui.min.js}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .gradient-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .circle-pink {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #ff6b9d 0%, #c44569 100%);
+            top: -250px;
+            left: -150px;
+        }
+
+        .circle-blue {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #4facfe 0%, #00f2fe 100%);
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        .circle-purple {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #a8edea 0%, #fed6e3 100%);
+            top: 30%;
+            left: 60%;
+            animation-delay: -10s;
+        }
+
+        .circle-gold {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #ffd93d 0%, #ff9500 100%);
+            top: 60%;
+            left: 10%;
+            animation-delay: -3s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        .cake-decoration {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.15;
+            animation: floatCake 8s infinite ease-in-out;
+        }
+
+        .cake-1 { top: 10%; left: 5%; animation-delay: 0s; }
+        .cake-2 { top: 25%; right: 10%; animation-delay: -2s; }
+        .cake-3 { bottom: 30%; left: 15%; animation-delay: -4s; }
+        .cake-4 { bottom: 15%; right: 5%; animation-delay: -6s; }
+        .cake-5 { top: 45%; left: 80%; animation-delay: -1s; }
+
+        @keyframes floatCake {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        nav {
+            position: relative;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.5em !important;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe, #a8edea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-nav > li > a {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav > li > a:hover {
+            color: #ff6b9d !important;
+        }
+
+        .navbar-nav > li.active > a {
+            color: #ff6b9d !important;
+        }
+
+        .dropdown-menu {
+            background: rgba(20, 30, 50, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-menu > li > a {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .dropdown-menu > li > a:hover {
+            background: rgba(255, 107, 157, 0.2) !important;
+            color: #ff6b9d !important;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 30px !important;
+        }
+
+        .search-input {
+            background: transparent !important;
+            border: none !important;
+            color: #fff !important;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b9d 0%, #4facfe 100%) !important;
+            border: none !important;
+            border-radius: 30px !important;
+            padding: 8px 25px !important;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding: 60px 20px;
+            min-height: calc(100vh - 100px);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe, #a8edea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 0 0 30px rgba(255, 107, 157, 0.3); }
+            50% { text-shadow: 0 0 50px rgba(255, 107, 157, 0.6); }
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 2px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 107, 157, 0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3),
+                        0 0 30px rgba(255, 107, 157, 0.1);
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.05), 
+                transparent);
+            transition: left 0.5s ease;
+        }
+
+        .product-card:hover::before {
+            left: 100%;
+        }
+
+        .product-image-container {
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.1);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-content {
+            padding: 25px;
+        }
+
+        .product-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .product-intro {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 15px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-price {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ff6b9d;
+            margin-bottom: 20px;
+        }
+
+        .product-stock {
+            font-size: 13px;
+            color: rgba(78, 205, 196, 0.8);
+            margin-bottom: 20px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-cart, .btn-detail {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cart {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.5);
+        }
+
+        .btn-detail {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-detail:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .empty-message {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        footer {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.2);
+            margin-top: 60px;
+        }
+
+        .ai-chat-button {
+            position: fixed;
+            right: 30px;
+            bottom: 120px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffb7c5 0%, #ff6b9d 100%);
+            color: white;
+            font-size: 28px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 35px rgba(255, 107, 157, 0.5);
+            z-index: 500;
+            transition: all 0.3s ease;
+            animation: floatBtn 3s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ai-chat-button:hover {
+            transform: scale(1.15);
+            box-shadow: 0 15px 45px rgba(255, 107, 157, 0.6);
+        }
+
+        .ai-chat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        @keyframes floatBtn {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .ai-chat-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 22px;
+            height: 22px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .ai-chat-modal {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 420px;
+            background: rgba(20, 30, 50, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .ai-chat-modal.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .ai-chat-header {
+            background: linear-gradient(135deg, #ffb7c5 0%, #ff6b9d 100%);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-chat-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .ai-chat-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .ai-chat-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .ai-chat-body {
+            height: 350px;
+            overflow-y: auto;
+            padding: 16px;
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .ai-chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ai-chat-message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            line-height: 1.5;
+            font-size: 13px;
+        }
+
+        .ai-chat-message.user {
+            align-self: flex-end;
+            background: #3b82f6;
+            color: #fff;
+            border-bottom-right-radius: 6px;
+        }
+
+        .ai-chat-message.ai {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 6px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .ai-msg-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .ai-msg-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .ai-msg-content {
+            flex: 1;
+            padding-top: 4px;
+        }
+
+        .ai-chat-typing {
+            display: flex;
+            gap: 6px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            border-bottom-left-radius: 6px;
+            align-self: flex-start;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .ai-chat-footer {
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+            background: rgba(20, 30, 50, 0.98);
+        }
+
+        .ai-chat-footer .ai-chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .ai-chat-footer .ai-chat-input:focus {
+            border-color: #3b82f6;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .ai-chat-footer .ai-chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .ai-chat-send {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .ai-chat-send:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .notification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .notification-popup {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 45px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .notification-popup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 107, 157, 0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .notification-icon {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .notification-icon.success {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4);
+        }
+
+        .notification-icon.error {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .notification-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ff6b9d, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .notification-message {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .notification-btn {
+            padding: 14px 45px;
+            border: none;
+            border-radius: 35px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #ff6b9d 0%, #4facfe 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+        }
+
+        .notification-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 107, 157, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 32px;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 20px;
+            }
+
+            .product-card {
+                border-radius: 20px;
+            }
+
+            .product-image-container {
+                height: 200px;
+            }
+        }
+    </style>   
+
+    <script type="text/javascript">
+        function queryGood(){
+            var name = $("#name").val();
+            location.href="/goods/goodsList?name="+name;
+        }
+
+        function seeDetail(id){
+            location.href="/goods/goodsList?id="+id;
+        }
+
+        function buy(id){
+            location.href="/cart/addToCart?id="+id;
+        }
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 80;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.width = (Math.random() * 3 + 1) + 'px';
+                star.style.height = star.style.width;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function closeNotification() {
+            document.getElementById('notificationOverlay').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+        });
+
+        function openAIChat() {
+            document.getElementById('aiChatModal').classList.add('show');
+            document.getElementById('aiChatInput').focus();
+        }
+
+        function closeAIChat() {
+            document.getElementById('aiChatModal').classList.remove('show');
+        }
+
+        document.getElementById('aiChatModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAIChat();
+            }
+        });
+
+        function askAIChat(question) {
+            document.getElementById('aiChatInput').value = question;
+            sendAIChatMessage();
+        }
+
+        function handleAIChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendAIChatMessage();
+            }
+        }
+
+        function sendAIChatMessage() {
+            var input = document.getElementById('aiChatInput');
+            var message = input.value.trim();
+            
+            if (!message) return;
+            
+            var messagesContainer = document.getElementById('aiChatMessages');
+            
+            var userMessage = document.createElement('div');
+            userMessage.className = 'ai-chat-message user';
+            userMessage.textContent = message;
+            messagesContainer.appendChild(userMessage);
+            
+            input.value = '';
+            
+            var typingIndicator = document.createElement('div');
+            typingIndicator.className = 'ai-chat-typing';
+            typingIndicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            messagesContainer.appendChild(typingIndicator);
+            
+            var chatBody = document.getElementById('aiChatBody');
+            chatBody.scrollTop = chatBody.scrollHeight;
+            
+            fetch('/ai/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                messagesContainer.removeChild(typingIndicator);
+                
+                var aiMessage = document.createElement('div');
+                aiMessage.className = 'ai-chat-message ai';
+                aiMessage.innerHTML = `
+                    <div class="ai-msg-avatar"><img src="/images/1781227633000.gif" alt="AI"></div>
+                    <div class="ai-msg-content">${data.reply}</div>
+                `;
+                messagesContainer.appendChild(aiMessage);
+                
+                chatBody.scrollTop = chatBody.scrollHeight;
+            })
+            .catch(error => {
+                messagesContainer.removeChild(typingIndicator);
+                
+                var errorMessage = document.createElement('div');
+                errorMessage.className = 'ai-chat-message ai';
+                errorMessage.innerHTML = `
+                    <div class="ai-msg-avatar"><img src="/images/1781227633000.gif" alt="AI"></div>
+                    <div class="ai-msg-content">抱歉，服务暂时不可用，请稍后重试。</div>
+                `;
+                messagesContainer.appendChild(errorMessage);
+                
+                chatBody.scrollTop = chatBody.scrollHeight;
+            });
+        }
+    </script>
+    
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="gradient-circle circle-pink"></div>
+        <div class="gradient-circle circle-blue"></div>
+        <div class="gradient-circle circle-purple"></div>
+        <div class="gradient-circle circle-gold"></div>
+        <div class="stars" id="stars"></div>
+        <span class="cake-decoration cake-1">🍰</span>
+        <span class="cake-decoration cake-2">🧁</span>
+        <span class="cake-decoration cake-3">🍪</span>
+        <span class="cake-decoration cake-4">🍩</span>
+        <span class="cake-decoration cake-5">🍫</span>
+    </div>
+
+    <nav class="navbar navbar-inverse" role="navigation">
+      <div class="container-fluid" style="font-size:1.2em; padding-top:10px; padding-left:50px; padding-right:50px;">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-example">
+            <span class="sr-only">切换导航</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" th:href="@{/goods/goodsList}">🍰 蛋糕系统</a>
+        </div> 
+        <div class="collapse navbar-collapse navbar-collapse-example" >
+          <ul class="nav navbar-nav">
+            <li class="active"><a th:href="@{/goods/goodsList}">首页</a></li>
+            
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">商品分类 <b class="caret"></b></a>
+              <ul class="dropdown-menu" role="menu">
+                <th:block th:each="type : ${typeList}">
+                    <li><a th:href="@{/goods/goodsList(typeid=${type.id})}" th:text="${type.name}"></a></li>
+                </th:block>
+              </ul>
+            </li>
+            
+            <li><a th:href="@{/goods/hotSales}">热销</a></li>
+            <li><a th:href="@{/goods/newProducts}">新品</a></li>
+            
+            <li><a th:href="@{/register}">注册</a></li>
+            <li><a th:href="@{/user/loginout}">退出登录</a></li>
+            <li><a th:href="@{/order/orderList}">我的订单</a></li>
+          </ul>
+          
+          <ul class="nav navbar-nav navbar-right">
+              <li><a th:href="@{/cart/myCart}">
+                  <i class="fas fa-shopping-cart" style="font-size:1.5em;"></i>
+                  <span class="label label-badge label-success" style="margin-bottom:6px;" th:text="${count}"></span>
+              </a></li>
+          </ul>
+          
+          <form class="navbar-form navbar-right form-search" role="search">
+           <div class="input-group">
+                <div class="input-control search-box search-box-circle has-icon-left has-icon-right search-example" id="searchboxExample">
+                   <input id="name" name="name" type="search" class="form-control search-input" placeholder="搜索蛋糕...">
+                       <label for="inputSearchExample3" class="input-control-icon-left search-icon"><i class="fas fa-search"></i></label>
+                    <span class="input-group-btn">
+                         <button class="btn btn-primary" type="button" onclick="queryGood()">搜索</button>
+                    </span>
+                </div>
+            </div>  
+          </form>
+                
+        </div>
+      </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">🍰 甜蜜时光</h1>
+            <p class="page-subtitle">精选美味蛋糕，为您的生活增添甜蜜</p>
+        </div>
+
+        <th:block th:if="${goodsList != null && !goodsList.isEmpty()}">
+            <div class="products-grid">
+                <th:block th:each="goods : ${goodsList}">
+                    <div class="product-card">
+                        <div class="product-image-container">
+                            <img th:src="@{${goods.cover}}" th:alt="${goods.name}" class="product-image">
+                            <span class="product-badge">精选推荐</span>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-name" th:text="${goods.name}"></h3>
+                            <p class="product-intro" th:text="${goods.intro}"></p>
+                            <div class="product-price">¥<span th:text="${goods.price}"></span></div>
+                            <div class="product-stock">库存: <span th:text="${goods.stock}"></span> 件</div>
+                            <div class="product-actions">
+                                <button class="btn-cart" th:onclick="buy([[${goods.id}]])">
+                                    <i class="fas fa-shopping-cart"></i> 加入购物车
+                                </button>
+                                <button class="btn-detail" th:onclick="seeDetail([[${goods.id}]])">
+                                    <i class="fas fa-eye"></i> 查看详情
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </th:block>
+
+        <th:block th:else>
+            <div class="empty-state">
+                <div class="empty-icon">🍰</div>
+                <h3 class="empty-title">暂无商品</h3>
+                <p class="empty-message">抱歉，当前没有商品可供浏览</p>
+            </div>
+        </th:block>
+    </div>
+
+    <footer>
+        <p>© 2026 蛋糕系统 - 用心烘焙每一份甜蜜</p>
+    </footer>
+
+    <button class="ai-chat-button" onclick="openAIChat()">
+        <img src="/images/1781227633000.gif" alt="AI" class="ai-chat-icon">
+        <span class="ai-chat-badge">💬</span>
+    </button>
+
+    <div id="aiChatModal" class="ai-chat-modal">
+        <div class="ai-chat-header">
+            <div class="ai-chat-title">
+                <img src="/images/1781227633000.gif" alt="AI" width="24" height="24" style="border-radius: 50%;"> 智能客服小昔涟
+            </div>
+            <button class="ai-chat-close" onclick="closeAIChat()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="ai-chat-body" id="aiChatBody">
+            <div class="ai-chat-messages" id="aiChatMessages">
+                <div class="ai-chat-message ai">
+                    <div class="ai-msg-avatar"><img src="/images/1781227633000.gif" alt="AI"></div>
+                    <div class="ai-msg-content">您好！我是小昔涟，很高兴为您服务！有什么可以帮助您的？</div>
+                </div>
+            </div>
+        </div>
+        <div class="ai-chat-footer">
+            <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="输入您的问题..." onkeyup="handleAIChatKeyPress(event)">
+            <button class="ai-chat-send" onclick="sendAIChatMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <div th:if="${msg != null}" class="notification-overlay" id="notificationOverlay">
+        <div class="notification-popup">
+            <div th:class="'notification-icon ' + (${msg.contains('成功')} ? 'success' : 'error')">
+                <span th:text="${msg.contains('成功') ? '🎉' : '😢'}"></span>
+            </div>
+            <h3 class="notification-title" th:text="${msg.contains('成功') ? '添加成功' : '添加失败'}"></h3>
+            <p class="notification-message" th:text="${msg.contains('成功') ? '🎉 恭喜！商品已成功加入购物车，快去看看吧~' : '😢 抱歉，该商品库存不足，请选择其他商品'}"></p>
+            <button class="notification-btn" onclick="closeNotification()">好的</button>
+        </div>
+    </div>
+</body>
+</html>
